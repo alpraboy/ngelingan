@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<link rel="manifest" href="manifest.json"><meta name="theme-color" content="#0f3d2e"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ngelingan: Admin Konten</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef2ee;--sf:#fff;--ink:#14251f;--mu:#5d6b64;--ac:#1f6f5c;--go:#b8872f;--ln:#d5ddd7}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1a16;--sf:#17261f;--ink:#e6efe9;--mu:#98a79f;--ac:#4fb398;--go:#e0b45e;--ln:#2a3d34}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;background:var(--sf);border-bottom:1px solid var(--ln);position:sticky;top:0;z-index:5}
+h1{margin:0;font:700 26px "Amiri",Georgia,serif;color:var(--ac)}
+nav{display:flex;gap:6px}nav button{border:0;background:none;color:var(--mu);font:600 15px system-ui,sans-serif;padding:8px 12px;border-radius:8px;cursor:pointer}
+nav button.on{background:var(--ac);color:#fff}
+main{max-width:760px;margin:0 auto;padding:16px}
+section[hidden]{display:none}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:12px;padding:14px;margin-bottom:14px}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.bar h2{margin:0;font-size:18px}
+button.b{border:1px solid var(--ac);background:var(--ac);color:#fff;border-radius:8px;padding:9px 14px;font:600 15px system-ui,sans-serif;cursor:pointer}
+button.b.o{background:none;color:var(--ac)}button.b:disabled{opacity:.55;cursor:wait}
+#grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+#grid b{font-size:12px;color:var(--mu);font-weight:600}
+#grid .d{position:relative;aspect-ratio:1;border:1px solid var(--ln);background:none;color:var(--ink);border-radius:8px;font:15px system-ui,sans-serif;cursor:pointer}
+#grid .d small{position:absolute;right:3px;bottom:2px;font-size:11px;color:var(--mu)}
+#grid .d.td{border-color:var(--go)}#grid .d.on{background:var(--ac);color:#fff;border-color:var(--ac)}#grid .d.on small{color:#fff}
+#grid .d.full small{color:var(--ac);font-weight:700}
+ul{list-style:none;margin:0;padding:0}
+.lst li{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--ln);cursor:pointer}
+.lst li.empty{cursor:default;color:var(--mu)}
+.tm{font-variant-numeric:tabular-nums;color:var(--mu);min-width:44px}
+.lst div{flex:1;min-width:0}.lst strong{display:block}.lst em{font-size:13px;color:var(--mu);font-style:normal}
+.st{font-size:12px;padding:2px 8px;border-radius:99px;border:1px solid var(--ln)}
+.st.sudah{background:var(--go);color:#fff;border-color:var(--go)}.chip{display:inline-block;border:1px solid var(--ln);border-radius:99px;padding:3px 10px;margin:3px 4px 0 0;font-size:13px}#log{font:13px/1.6 ui-monospace,Menlo,monospace;background:var(--bg);border:1px solid var(--ln);border-radius:8px;padding:10px;max-height:190px;overflow:auto;white-space:pre-wrap}#rs h3{font-size:15px;margin:14px 0 4px}#rs p{margin:0;white-space:pre-wrap}.ar{font:700 22px/1.8 "Amiri",serif;direction:rtl;text-align:center}
+label{display:block;font-size:14px;font-weight:600;margin:10px 0 4px}
+input,select,textarea{width:100%;padding:9px 10px;border:1px solid var(--ln);border-radius:8px;background:var(--bg);color:var(--ink);font:15px system-ui,sans-serif}
+textarea{min-height:90px;resize:vertical}
+.hint{font-size:13px;color:var(--mu);margin:6px 0 0}
+dialog{width:min(560px,94vw);max-height:92vh;border:1px solid var(--ln);border-radius:14px;background:var(--sf);color:var(--ink);padding:16px}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.row>*{flex:1}
+.warn{background:rgba(184,135,47,.15);border-left:3px solid var(--go);padding:8px 10px;font-size:13px;border-radius:6px;margin-top:8px}
+#toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;max-width:90vw;opacity:0;pointer-events:none;transition:opacity .25s}
+#toast.on{opacity:1}
+</style>
+</head>
+<body>
+<header><h1>Ngelingan</h1><nav><button data-t="hr" class="on">Hari ini</button><button data-t="kal">Kalender</button><button data-t="gen">Generate</button><button data-t="set">Pengaturan</button></nav></header>
+<main>
+<section id="hr"><div class="card"><div class="bar"><h2 id="ht">Tugas hari ini</h2></div><ul id="hl" class="lst"></ul></div><button class="b" id="ga" style="width:100%;margin-bottom:10px">Generate semua tugas hari ini (otomatis berurutan)</button><p class="hint">Saat jam upload tiba, tekan Generate video pada tugasnya. Kerjakan satu per satu sampai tugas hari ini selesai.</p></section>
+<section id="kal" hidden>
+<div class="card"><div class="bar"><button class="b o" id="pv" aria-label="Bulan sebelumnya">‹</button><h2 id="mt"></h2><button class="b o" id="nx" aria-label="Bulan berikutnya">›</button></div><div id="grid"></div></div>
+<div class="card"><div class="bar"><h2 id="dt"></h2></div><ul id="list" class="lst"></ul></div>
+<button class="b" id="plan" style="width:100%">Isi kalender bulan ini dengan AI</button><p class="hint" id="sm2"></p>
+<p class="hint">AI hanya menyusun tema dan rujukan. Teks ayat, hadits, dan doa nanti diambil dari sumber yang jelas, dan semua rujukan perlu kamu periksa.</p>
+</section>
+<section id="gen" hidden><div class="card">
+<div class="bar"><h2>Buat satu konten</h2></div>
+<label for="gj">Jenis konten</label><select id="gj"></select>
+<label for="gt">Tema atau topik (boleh dikosongkan, AI memilih)</label><input id="gt" placeholder="contoh: sabar saat diuji">
+<label for="gd">Tanggal</label><input id="gd" type="date">
+<label for="gh">Jam upload</label><input id="gh" type="time" value="12:00">
+<div class="row"><button class="b" id="gg">Generate dengan AI</button></div>
+<p class="hint">Hasilnya langsung masuk ke kalender sebagai draf, lalu terbuka untuk kamu periksa dan ubah.</p>
+</div></section>
+<section id="set" hidden>
+<div class="card"><div class="bar"><h2>Pengaturan</h2></div>
+<label for="sk">Kunci API Gemini</label><input id="sk" type="password" autocomplete="off" placeholder="tempel kunci di sini">
+<p class="hint">Disimpan hanya di peramban ini. Kunci gratis bisa dibuat di Google AI Studio.</p>
+<label for="sm">Model teks (urutan prioritas, pisahkan dengan koma)</label><input id="sm" list="ml"><datalist id="ml"><option value="gemini-3.6-flash"><option value="gemini-3.8-flash"><option value="gemini-3.5-flash-lite"></datalist>
+<p class="hint">Kalau satu model gagal atau kuotanya habis, sistem otomatis pindah ke model berikutnya, termasuk model yang ditemukan otomatis dari akun Google AI-mu. Tidak perlu mengganti manual.</p>
+<label for="sn">Jumlah video per hari</label><select id="sn"><option>3</option><option>4</option><option>5</option></select>
+<label for="sst">Jika sumber terpercaya tidak ditemukan</label><select id="sst"><option value="gagal">Gagal saja, jangan tebak (disarankan)</option><option value="ai">Tetap buat dengan teks AI, wajib dicek</option></select><p class="hint">Agen mencari sumber sendiri: Al-Quran dan hadis dari sumber teks, tafsir Jalalayn, Wikipedia, lalu pencarian web Gemini untuk kitab, ulama, dan lembaga.</p><label for="sw">Teks watermark video</label><input id="sw">
+<label>Mode suara per jenis konten</label><div id="mvbox"></div><p class="hint">Isi dalil (ayat, hadis, doa): penuh = bacaan Arab (qari, atau suara AI bila tidak ada qari) lalu arti dibacakan; arti = qari lalu arti; qari = hanya qari; hemat = hanya arti dibacakan; tanpa = tanpa suara. Penjelasan dan narasi dibacakan kecuali mode qari atau tanpa. Tiap konten dibuat dari isi yang berbeda, tidak diulang demi menambah durasi.</p>
+<label for="sim">Model gambar AI (urutan prioritas, pisahkan dengan koma)</label><input id="sim">
+<label for="stm">Model suara AI (urutan prioritas, pisahkan dengan koma)</label><input id="stm">
+<label for="stv">Nama suara</label><input id="stv">
+<p class="hint">Model yang gagal dilewati otomatis, dan model yang berhasil dipakai lebih dulu pada proses berikutnya.</p>
+<label for="syt">API YouTube (token akses)</label><input id="syt" type="password" autocomplete="off">
+<label for="sfb">API Facebook (token halaman)</label><input id="sfb" type="password" autocomplete="off">
+<label for="stt">API TikTok (token akses)</label><input id="stt" type="password" autocomplete="off">
+<p class="hint">Kosongkan kalau upload manual. Upload otomatis dihubungkan di Tahap 3.</p>
+<div class="row"><button class="b o" id="tkn" type="button">Tes koneksi sumber</button><button class="b o" id="khb" type="button">Kumpulkan hadis ke bank</button></div><pre id="tko" class="hint" style="white-space:pre-wrap"></pre><div class="row"><button class="b" id="ss">Simpan pengaturan</button></div></div>
+<div class="card"><div class="bar"><h2>Cadangan data</h2></div>
+<p class="hint" style="margin-top:0">Data kalender tersimpan di peramban ini saja. Unduh cadangan secara berkala.</p>
+<div class="row"><button class="b o" id="ex">Unduh cadangan</button><button class="b o" id="im">Pulihkan dari file</button></div><input id="imf" type="file" accept=".json" hidden></div>
+</section>
+</main>
+<dialog id="dlg"><div class="bar"><h2 id="dh">Detail konten</h2><button class="b o" id="dx" aria-label="Tutup">✕</button></div><div id="df"></div>
+<div class="warn">Periksa rujukan ayat, hadits, atau doa dari sumber asli sebelum dipakai. AI bisa keliru.</div>
+<div class="row"><button class="b" id="dgv">Generate video</button><button class="b" id="dsv">Simpan</button><button class="b o" id="dai">Lengkapi dengan AI</button><button class="b o" id="ddl">Hapus</button></div></dialog>
+<dialog id="vd"><div class="bar"><h2 id="vh">Generate video</h2><button class="b o" id="vx" aria-label="Tutup">✕</button></div>
+<div id="log"></div><div id="rs"></div>
+<div class="row" id="vb" hidden><button class="b" data-u="YouTube">Upload YouTube</button><button class="b" data-u="Facebook">Upload Facebook</button><button class="b" data-u="TikTok">Upload TikTok</button></div>
+<div class="row" id="vb2" hidden><button class="b o" id="vdl">Unduh video</button><button class="b o" id="vdt">Unduh teks</button><button class="b o" id="vmk">Tandai sudah diunggah</button><button class="b o" id="vre">Generate ulang</button></div></dialog>
+<div id="toast" role="status"></div>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const J=['Al-Quran & tafsir','Hadis & sunnah','Fikih & ibadah','Doa & zikir','Motivasi & pengingat','Sejarah & kisah Islam','Akhlak & sosial','Ilmu Islam & tanya jawab'];
+const HR={3:['06:00','12:00','19:00'],4:['05:30','12:00','16:30','20:00'],5:['05:30','09:00','12:00','16:30','20:00']};
+const DEF={key:'',model:'gemini-3.6-flash,gemini-3.8-flash,gemini-3.5-flash-lite,gemini-2.5-flash',slots:4,wm:'Ngelingan',yt:'',fb:'',tt:'',im:'gemini-2.5-flash-image',tm:'gemini-2.5-flash-preview-tts',tv:'Algenib',sb:'gagal',mvv:4,mv:{'Al-Quran & tafsir':'penuh','Hadis & sunnah':'penuh','Fikih & ibadah':'hemat','Doa & zikir':'penuh','Motivasi & pengingat':'hemat','Sejarah & kisah Islam':'hemat','Akhlak & sosial':'hemat','Ilmu Islam & tanya jawab':'hemat'}};
+const F=[['judul','Judul','input'],['jenis','Pilar konten','select'],['sub','Sub-tema','input'],['tema','Tema atau kata kunci (nama ulama, nama tokoh, topik)','input'],['wil','Wilayah (untuk sejarah, boleh kosong)','input'],['date','Tanggal','date'],['time','Jam','time'],['status','Status','select'],['rujukan','Rujukan (surat:ayat, perawi, atau nama doa)','input'],['ref','Kode sumber otomatis (ayat contoh 94:5-8, hadits contoh bukhari:1)','input'],['ket','Keterangan di layar','input'],['sumber','Sumber yang tampil di video','input'],['arab','Teks Arab (hanya untuk mengganti manual bila sumber gagal)','textarea'],['terjemah','Terjemah (hanya untuk mengganti manual bila sumber gagal)','textarea'],['narasi','Naskah narasi renungan','textarea'],['caption','Caption','textarea'],['hashtag','Hashtag','input'],['prompt','Prompt gambar (Inggris)','textarea']];
+const p=n=>String(n).padStart(2,'0'),iso=d=>d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let S={cfg:{...DEF},items:[]},cur=new Date(),sel=iso(new Date()),eid=null;
+function load(){try{const r=JSON.parse(localStorage.getItem('ngelingan_v1')||'null');if(r){S.items=(r.items||[]).map(x=>migr({...x,status:x.status=='diunggah'?'sudah':(x.status=='sudah'?'sudah':'belum')}));S.cfg={...DEF,...(r.cfg||{})};if((S.cfg.mvv||0)<4){S.cfg.mv={...DEF.mv};S.cfg.mvv=4}}}catch(e){}}
+function save(){try{localStorage.setItem('ngelingan_v1',JSON.stringify(S))}catch(e){toast('Data belum bisa disimpan di peramban ini. Unduh cadangan.')}}
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),3800)}
+async function ai(q){if(!S.cfg.key)throw new Error('Isi kunci API Gemini dulu di tab Pengaturan.');
+const d=await gemAuto('t',{contents:[{parts:[{text:q}]}],generationConfig:{responseMimeType:'application/json',temperature:.8}});
+const t=d.candidates[0].content.parts.map(x=>x.text||'').join('');return JSON.parse(t.replace(/```json|```/g,'').trim())}
+function cal(){
+const y=cur.getFullYear(),m=cur.getMonth(),n=new Date(y,m+1,0).getDate(),off=(new Date(y,m,1).getDay()+6)%7,td=iso(new Date());
+$('#mt').textContent=new Date(y,m,1).toLocaleDateString('id-ID',{month:'long',year:'numeric'});
+let h=['Sen','Sel','Rab','Kam','Jum','Sab','Min'].map(d=>'<b>'+d+'</b>').join('');
+for(let i=0;i<off;i++)h+='<i></i>';
+for(let d=1;d<=n;d++){const k=y+'-'+p(m+1)+'-'+p(d),c=S.items.filter(x=>x.date==k).length;
+h+='<button class="d'+(k==sel?' on':'')+(k==td?' td':'')+(c>=S.cfg.slots?' full':'')+'" data-k="'+k+'">'+d+(c?'<small>'+c+'</small>':'')+'</button>'}
+$('#grid').innerHTML=h;day();hr();stat()}
+function day(){
+const L=S.items.filter(x=>x.date==sel).sort((a,b)=>a.time<b.time?-1:1);
+$('#dt').textContent=new Date(sel+'T00:00').toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long'});
+$('#list').innerHTML=L.length?L.map(x=>'<li data-id="'+x.id+'"><span class="tm">'+esc(x.time)+'</span><div><strong>'+esc(x.judul||x.tema)+'</strong><em>'+esc(x.jenis)+' · '+((x.narasi||x.dibuat)?'konten siap':'belum dibuat')+'</em></div><span class="st '+x.status+'">'+(x.status=='sudah'?'sudah upload':'belum upload')+'</span></li>').join(''):'<li class="empty">Belum ada konten di hari ini. Isi otomatis atau buat lewat tab Generate.</li>'}
+const nid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+async function plan(){
+const y=cur.getFullYear(),m=cur.getMonth(),n=new Date(y,m+1,0).getDate(),hrs=HR[S.cfg.slots]||HR[4],b=$('#plan');
+if(!confirm('AI akan mengisi kalender bulan ini dengan '+S.cfg.slots+' video per hari. Lanjut?'))return;
+b.disabled=true;let add=0;
+try{for(let a=1;a<=n;a+=7){const z=Math.min(a+6,n),s=y+'-'+p(m+1)+'-'+p(a),e=y+'-'+p(m+1)+'-'+p(z);
+b.textContent='Menyusun tanggal '+a+' sampai '+z+' dari '+n+'...';
+const r=await ai('Kamu perencana konten dakwah Islam untuk channel "Ngelingan" (video pendek minimal 45 detik, isi tidak boleh diulang-ulang). Buat rencana dari '+s+' sampai '+e+', '+S.cfg.slots+' video per hari, jam: '+hrs.join(', ')+'. Jenis (pilar) hanya boleh persis salah satu dari: '+J.join(' | ')+'. Sub-tema per pilar: '+J.map(j=>j+' = ['+SUB[j].join('; ')+']').join(' || ')+'. Variasikan pilar dan sub-tema, jangan ada sub-tema sama dalam satu hari, hari Jumat sertakan tema Jumat berkah. Jangan menulis teks Arab. ATURAN: Al-Quran & tafsir: isi "ref" surat:ayatawal-ayatakhir (3 sampai 6 ayat berurutan bila pendek, contoh 94:5-8). Hadis & sunnah: bila sub-tema hadis shahih atau hasan, isi "ref" kitab:nomor dengan kitab hanya bukhari atau muslim (contoh bukhari:1), selain itu kosongkan. Doa & zikir: kosongkan "ref"; isi "tema" satu kata kunci seperti ampunan, orang tua, ilmu, kesulitan, keluarga, tidur. Sejarah & kisah Islam: untuk sub-tema sejarah peradaban dan peristiwa penting, sebarkan ke SELURUH dunia dan sepanjang masa (Nusantara, Andalusia, Turki, Asia Tengah, India, Afrika, Tiongkok, Persia, Balkan, dan lainnya, jangan didominasi Timur Tengah) dan isi "wilayah"; isi "tema" dengan nama tokoh atau peristiwa. Fikih & ibadah, Akhlak & sosial, Ilmu Islam & tanya jawab, Motivasi & pengingat: isi "tema" dengan topik spesifik. Kolom "judul": menarik tetapi tidak menyesatkan, maksimal 9 kata. Pilih tema yang disepakati lintas mazhab dan hindari khilafiyah tajam, politik, dan takfir. Jangan mengarang dalil, ayat, hadis, atau kutipan ulama. Jangan buat konten yang menampilkan wajah nabi atau sahabat. Perhatikan momen Islam di rentang tanggal ini (Jumat, bulan Hijriah, hari besar). Hindari judul yang mirip dengan ini: '+S.items.slice(-40).map(x=>x.judul).filter(Boolean).join('; ')+'. Balas hanya JSON array: [{"tanggal":"YYYY-MM-DD","jam":"HH:MM","jenis":"","sub":"","tema":"","wilayah":"","judul":"","ref":""}]');
+(Array.isArray(r)?r:[]).forEach(o=>{o.jenis=MIGR[o.jenis]||o.jenis;if(!o.tanggal||o.tanggal<s||o.tanggal>e||!J.includes(o.jenis))return;
+if(S.items.some(x=>x.date==o.tanggal&&x.time==o.jam))return;
+S.items.push({id:nid(),date:o.tanggal,time:o.jam||'12:00',jenis:o.jenis,tema:o.tema||'',judul:o.judul||'',rujukan:o.rujukan||'',ref:o.ref||'',sub:o.sub||'',wil:o.wilayah||'',narasi:'',caption:'',hashtag:'',prompt:'',status:'belum'});add++});
+save();cal()}
+toast(add+' konten ditambahkan ke kalender.')}catch(e){save();cal();toast(e.message+(add?' ('+add+' konten sudah masuk.)':''))}
+b.disabled=false;b.textContent='Isi kalender bulan ini dengan AI'}
+async function fill(x){await siapkanKonten(x);save()}
+function openItem(id){
+const x=S.items.find(i=>i.id==id);if(!x)return;eid=id;
+$('#df').innerHTML=F.map(([k,l,t])=>{const v=esc(x[k]),i='f_'+k;let c;
+if(t=='textarea')c='<textarea id="'+i+'">'+v+'</textarea>';
+else if(k=='jenis')c='<select id="'+i+'">'+J.map(j=>'<option'+(j==x.jenis?' selected':'')+'>'+j+'</option>').join('')+'</select>';
+else if(k=='status')c='<select id="'+i+'">'+['belum','sudah'].map(j=>'<option'+(j==x.status?' selected':'')+'>'+j+'</option>').join('')+'</select>';
+else c='<input id="'+i+'" type="'+(t=='input'?'text':t)+'" value="'+v+'">';
+return '<label for="'+i+'">'+l+'</label>'+c}).join('');
+$('#dlg').showModal()}
+function readForm(x){F.forEach(([k])=>{x[k]=$('#f_'+k).value})}
+$('#dsv').onclick=()=>{const x=S.items.find(i=>i.id==eid);readForm(x);if(x.status=='sudah')dropVid(x.id);save();sel=x.date;$('#dlg').close();cur=new Date(x.date+'T00:00');cal();toast('Tersimpan.')};
+$('#ddl').onclick=()=>{if(!confirm('Hapus konten ini dari kalender?'))return;dropVid(eid);S.items=S.items.filter(i=>i.id!=eid);save();$('#dlg').close();cal()};
+$('#dx').onclick=()=>$('#dlg').close();
+$('#dai').onclick=async()=>{const x=S.items.find(i=>i.id==eid),b=$('#dai');readForm(x);b.disabled=true;b.textContent='AI sedang menulis...';
+try{await fill(x);openItem(eid);toast('Naskah selesai. Silakan periksa.')}catch(e){toast(e.message)}b.disabled=false;b.textContent='Lengkapi dengan AI'};
+$('#gg').onclick=async()=>{const b=$('#gg'),x={id:nid(),date:$('#gd').value||sel,time:$('#gh').value||'12:00',jenis:$('#gj').value,tema:$('#gt').value.trim(),judul:'',rujukan:'',narasi:'',caption:'',hashtag:'',prompt:'',status:'belum'};
+b.disabled=true;b.textContent='AI sedang menulis...';
+try{S.items.push(x);save();sel=x.date;cur=new Date(x.date+'T00:00');cal();genVideo(x.id)}catch(e){toast(e.message)}b.disabled=false;b.textContent='Generate dengan AI'};
+$('#plan').onclick=plan;
+$('#pv').onclick=()=>{cur=new Date(cur.getFullYear(),cur.getMonth()-1,1);cal()};
+$('#nx').onclick=()=>{cur=new Date(cur.getFullYear(),cur.getMonth()+1,1);cal()};
+$('#grid').onclick=e=>{const k=e.target.closest('.d');if(k){sel=k.dataset.k;cal()}};
+$('#list').onclick=e=>{const l=e.target.closest('li[data-id]');if(l)openItem(l.dataset.id)};
+$$('nav button').forEach(b=>b.onclick=()=>{$$('nav button').forEach(x=>x.classList.toggle('on',x==b));['hr','kal','gen','set'].forEach(s=>$('#'+s).hidden=s!=b.dataset.t);if(b.dataset.t=='gen')$('#gd').value=sel});
+$('#ss').onclick=()=>{S.cfg={key:$('#sk').value.trim(),model:$('#sm').value.trim()||DEF.model,slots:+$('#sn').value,wm:$('#sw').value.trim()||DEF.wm,yt:$('#syt').value.trim(),fb:$('#sfb').value.trim(),tt:$('#stt').value.trim(),sb:$('#sst').value,mvv:4,mv:Object.fromEntries(J.map(j=>[j,$('#mv_'+j.replace(/[^A-Za-z0-9]/g,'_')).value])),im:$('#sim').value.trim()||DEF.im,tm:$('#stm').value.trim()||DEF.tm,tv:$('#stv').value.trim()||DEF.tv};Object.keys(MEM).forEach(k=>delete MEM[k]);save();cal();toast('Pengaturan tersimpan.')};
+$('#ex').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({items:S.items,cfg:{...S.cfg,key:'',yt:'',fb:'',tt:''}},null,1)],{type:'application/json'}));a.download='ngelingan-cadangan-'+iso(new Date())+'.json';a.click()};
+$('#im').onclick=()=>$('#imf').click();
+$('#imf').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!Array.isArray(d.items))throw 0;if(!confirm('Data sekarang akan diganti dengan isi file ini. Lanjut?'))return;S.items=(d.items||[]).map(migr);S.cfg={...S.cfg,...d.cfg,key:S.cfg.key,yt:S.cfg.yt,fb:S.cfg.fb,tt:S.cfg.tt};save();cal();toast('Data dipulihkan.')}catch(x){toast('File cadangan tidak dikenali.')}};r.readAsText(f)};
+function hr(){const t=iso(new Date()),L=S.items.filter(x=>x.date==t).sort((a,b)=>a.time<b.time?-1:1);
+$('#ht').textContent='Tugas hari ini ('+L.filter(x=>x.status=='sudah').length+' dari '+L.length+' sudah diunggah)';
+$('#hl').innerHTML=L.length?L.map(x=>'<li><span class="tm">'+esc(x.time)+'</span><div><strong>'+esc(x.judul||x.tema)+'</strong><em>'+esc(x.jenis)+' · '+(x.status=='sudah'?'sudah upload':'belum upload')+((x.narasi||x.dibuat)?' · konten siap':'')+(VID[x.id]?' · video tersimpan':'')+'</em></div><button class="b" data-g="'+x.id+'">'+((x.narasi||x.dibuat)?'Buka hasil':'Generate video')+'</button></li>').join(''):'<li class="empty">Belum ada jadwal hari ini. Buka tab Kalender lalu isi bulan ini dengan AI.</li>'}
+function stat(){const k=cur.getFullYear()+'-'+p(cur.getMonth()+1),L=S.items.filter(x=>x.date.slice(0,7)==k);$('#sm2').textContent=L.length?L.filter(x=>x.status=='sudah').length+' dari '+L.length+' video bulan ini sudah diunggah.':''}
+const dl=(t,n,m)=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:m}));a.download=n;a.click()};
+const lg=m=>{const l=$('#log');l.textContent+=new Date().toLocaleTimeString('id-ID')+'  '+m+'\n';l.scrollTop=l.scrollHeight};
+async function jget(u){const r=await fetch(u);if(!r.ok)throw new Error('HTTP '+r.status);return r.json()}
+let vid=null;
+$('#hl').onclick=e=>{const b=e.target.closest('[data-g]');if(b)genVideo(b.dataset.g)};
+$('#dgv').onclick=()=>{const x=S.items.find(i=>i.id==eid);readForm(x);save();$('#dlg').close();genVideo(eid)};
+$('#vx').onclick=()=>$('#vd').close();
+$('#vre').onclick=()=>{if(confirm('Generate ulang akan mengganti naskah, caption, dan desain. Lanjut?'))genVideo(vid,true)};
+$('#vmk').onclick=()=>{const x=S.items.find(i=>i.id==vid);x.status='sudah';dropVid(vid);save();cal();$('#vd').close();toast('Ditandai sudah diunggah. Video dihapus dari penyimpanan.')};
+$('#rs').onclick=e=>{if(e.target.id=='cc'){const x=S.items.find(i=>i.id==vid);navigator.clipboard.writeText(x.caption+'\n\n'+x.hashtag).then(()=>toast('Tersalin.'),()=>toast('Gagal menyalin.'))}};
+$('#vb').onclick=e=>{const b=e.target.closest('[data-u]');if(!b)return;const k={YouTube:'yt',Facebook:'fb',TikTok:'tt'}[b.dataset.u];toast(S.cfg[k]?'Upload otomatis ke '+b.dataset.u+' dihubungkan di Tahap 3, setelah video jadi di Tahap 2.':'API '+b.dataset.u+' belum diisi. Isi di tab Pengaturan.')};
+$('#vdt').onclick=()=>{const x=S.items.find(i=>i.id==vid);dl([x.judul,x.date+' '+x.time+' · '+x.jenis,'','Rujukan: '+x.rujukan,'','ARAB:',x.arab||'','TERJEMAH:',x.terjemah||'','','NARASI:',x.narasi,'','CAPTION:',x.caption,x.hashtag,'','PROMPT GAMBAR:',x.prompt,'','Audio qari: '+(x.audio||'-'),'','SUMBER: '+(x.sumber||'-'),...(x.sumberUrl||[])].join('\n'),'ngelingan-'+x.date+'-'+x.time.replace(':','')+'.txt','text/plain')};
+const VID={},clamp=v=>v<0?0:v>1?1:v,b2a=b=>Uint8Array.from(atob(b),c=>c.charCodeAt(0));
+const SC={sawah:['#2f5f8f','#f0b36a','#3f7a2e'],danau:['#274b6e','#9db9c9','#2d5a52'],gunung:['#2a4a72','#e9b98a','#4a5d52'],pantai:['#1f5f8f','#f4c98d','#2a7f8f'],hutan:['#1d3a2c','#8fb27a','#14301f'],'langit-malam':['#050b1f','#1b2f5e','#0d1b3a'],'padang-pasir':['#27527c','#f3c47c','#c78f4a'],hujan:['#27323f','#6d7f8c','#34434a'],'kebun-kelapa':['#2b5e86','#f2bd74','#2e6a32'],'pagi-berkabut':['#5b7c99','#e8d9c0','#5f7f66']};
+async function gem(model,body){const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(model)+':generateContent?key='+encodeURIComponent(S.cfg.key),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(!r.ok){let m='';try{m=(await r.json()).error.message}catch(e){}throw new Error('HTTP '+r.status+' '+m.slice(0,120))}return r.json()}
+async function getImg(x){const d=await gemAuto('i',{contents:[{parts:[{text:x.prompt+'. Vertical 9:16 portrait composition, photorealistic, cinematic natural light, no people, no text, no watermark.'}]}],generationConfig:{responseModalities:['IMAGE','TEXT']}},120000);
+const q=(d.candidates[0].content.parts||[]).find(z=>z.inlineData);if(!q)throw new Error('tidak ada gambar');return createImageBitmap(new Blob([b2a(q.inlineData.data)],{type:q.inlineData.mimeType||'image/png'}))}
+async function tts(ac,text){const d=await gemAuto('s',{contents:[{parts:[{text:text}]}],generationConfig:{responseModalities:['AUDIO'],speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:S.cfg.tv}}}}},180000);
+const q=d.candidates[0].content.parts.find(z=>z.inlineData),u=b2a(q.inlineData.data),n=u.length>>1,b=ac.createBuffer(1,n,24000),ch=b.getChannelData(0),v=new DataView(u.buffer);for(let i=0;i<n;i++)ch[i]=v.getInt16(i*2,true)/32768;return b}
+function H(x,y,s){const n=Math.sin(x*127.1+y*311.7+s*74.7)*43758.5453;return n-Math.floor(n)}
+function vn(x,y,px,s){const xi=Math.floor(x),yi=Math.floor(y);let xf=x-xi,yf=y-yi;xf=xf*xf*(3-2*xf);yf=yf*yf*(3-2*yf);const x0=((xi%px)+px)%px,x1=(x0+1)%px,a=H(x0,yi,s),b=H(x1,yi,s),c=H(x0,yi+1,s),d=H(x1,yi+1,s);return a+(b-a)*xf+(c-a)*yf+(a-b-c+d)*xf*yf}
+function cloudCv(seed){const w=270,h=70,c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d'),im=g.createImageData(w,h),d=im.data;
+for(let j=0;j<h;j++)for(let i=0;i<w;i++){let t=0,a=.5,f=1;for(let k=0;k<4;k++){t+=a*vn(i/w*3*f,j/h*1.5*f,3*f,seed);a*=.5;f*=2}let v=clamp((t-.45)/.3);v=v*v*(3-2*v)*Math.sin(Math.PI*j/h);const q=(j*w+i)*4;d[q]=255;d[q+1]=240-j;d[q+2]=225-j*1.2;d[q+3]=v*200}
+g.putImageData(im,0,0);return c}
+function wrap(g,t,w){const L=[];let l='';for(const q of String(t||'').split(/\s+/).filter(Boolean)){const z=l?l+' '+q:q;if(g.measureText(z).width>w&&l){L.push(l);l=q}else l=z}if(l)L.push(l);return L}
+function fit(g,t,fam,wt,size,w,maxH,lh,min){let s=size,L=[];for(;s>=min;s-=2){g.font=wt+' '+s+'px '+fam;L=wrap(g,t,w);if(L.length*s*lh<=maxH)break}return{L,s,fam,wt}}
+function rr(g,x,y,w,h,r){g.beginPath();if(g.roundRect)g.roundRect(x,y,w,h,r);else g.rect(x,y,w,h);g.fill()}
+function draw(g,R,t){const W=540,Hh=960,T=R.T,x=R.x,tt=x.tata;
+if(R.img){const iw=R.img.width,ih=R.img.height,sc=Math.max(W/iw,Hh/ih)*1.08,dw=iw*sc,dh=ih*sc,ox=(W-dw)/2+Math.sin(t*.15)*6,oy=(Hh-dh)/2,N=40,sh=Hh/N;
+for(let i=0;i<N;i++){const y=i*sh,am=(y/Hh)*(y/Hh)*5,dx=Math.sin(t*1.3+y*.03)*am;g.drawImage(R.img,0,((y-oy)/dh)*ih,iw,(sh/dh)*ih+1,ox+dx,y,dw,sh+1)}}
+else bgDraw(g,R,t);
+(R.bg?[]:[[0,.5,7,20],[1,.32,4,150]]).forEach(q=>{const o=(t*q[2])%1080;g.globalAlpha=q[1];g.drawImage(R.cl[q[0]],-o,q[3],1080,280);g.drawImage(R.cl[q[0]],1080-o,q[3],1080,280)});g.globalAlpha=1;
+g.globalCompositeOperation='screen';const a=.1+.05*Math.sin(t*.6),rg=g.createRadialGradient(380,260,10,380,260,520);rg.addColorStop(0,'rgba(255,225,160,'+a*2+')');rg.addColorStop(1,'rgba(255,225,160,0)');g.fillStyle=rg;g.fillRect(0,0,W,Hh);
+R.dust.forEach(p=>{const y=((p.y-t*p.v*18)%Hh+Hh)%Hh;g.globalAlpha=.55*Math.abs(Math.sin(t*.8+p.x));g.fillStyle='#fff3c8';g.beginPath();g.arc(p.x+Math.sin(t*.5+p.y)*8,y,p.s,0,6.3);g.fill()});
+g.globalAlpha=1;g.globalCompositeOperation='source-over';
+const vg=g.createRadialGradient(270,480,200,270,480,620);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.45)');g.fillStyle=vg;g.fillRect(0,0,W,Hh);const tg=g.createLinearGradient(0,0,0,270);tg.addColorStop(0,'rgba(0,0,0,.4)');tg.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=tg;g.fillRect(0,0,W,270);
+lumUpdate(g,R,t);textLayer(g,R,t);g.save();g.shadowColor='rgba(0,0,0,.7)';extras(g,R,t);g.globalAlpha=.65;g.shadowBlur=6;g.textAlign='left';g.font='600 20px system-ui,sans-serif';g.fillStyle='#fff';g.fillText(S.cfg.wm,24,62);g.restore()}
+async function renderVideo(x){
+if(!S.cfg.key){lg('Kunci API belum diisi.');return}
+const AC=window.AudioContext||window.webkitAudioContext,ac=new AC(),R={x,pal:SC[x.scene]||SC.sawah,cl:[cloudCv(3),cloudCv(11)],dust:Array.from({length:22},()=>({x:Math.random()*540,y:Math.random()*960,s:1+Math.random()*2,v:.5+Math.random()}))};
+lg('4a Membuat gambar AI ('+S.cfg.im+')...');
+try{R.img=await getImg(x);lg(R.img?'    Ilustrasi latar siap.':'    Memakai ilustrasi buatan kode.')}catch(e){lg('    Latar buatan kode dipakai ('+e.message+').')}
+let bA=null,bI=null,tA0=0,tB0=0;await siapAudio(R,x,ac);
+try{R.bgm=await pickBgm(ac)}catch(e){R.bgm=null}lg('    Backsound: '+(R.bgm?'musik dari bank backsound.':'nada dasar buatan kode (bank backsound kosong).'));
+layout(R);setupAd(R);try{await document.fonts.load('700 30px Amiri')}catch(e){}
+const cv=document.createElement('canvas');cv.width=540;cv.height=960;cv.style.cssText='width:100%;max-height:60vh;object-fit:contain;border-radius:10px;background:#000';$('#rs').innerHTML='';$('#rs').appendChild(cv);const g=cv.getContext('2d');
+try{const fq=await offlineRender(R,g,cv,bA,bI,tA0,tB0,x);if(fq){VID[x.id]={url:URL.createObjectURL(fq),ext:'mp4'};await vput(x.id,fq,'mp4');lg('Video tersimpan permanen di peramban sampai ditandai sudah diunggah. Video selesai ('+(fq.size/1e6).toFixed(1)+' MB, '+R.T.toFixed(0)+' detik).');ac.close();return}}catch(e){lg('    Render cepat gagal ('+e.message+'). Memakai perekaman biasa.')}
+const dst=ac.createMediaStreamDestination(),bg=ac.createGain(),lp=ac.createBiquadFilter(),t0=ac.currentTime+.3,T=R.T;bg.gain.value=0;bg.connect(dst);lp.type='lowpass';lp.frequency.value=700;lp.connect(bg);
+(R.bgm?[]:[[73.4,.09],[110,.07],[146.8,.06],[220,.03],[293.7,.02]]).forEach((q,k)=>{const o=ac.createOscillator(),gn=ac.createGain(),l=ac.createOscillator(),lq=ac.createGain();o.type='sine';o.frequency.value=q[0];gn.gain.value=q[1];l.frequency.value=.05+k*.02;lq.gain.value=q[1]*.4;l.connect(lq);lq.connect(gn.gain);o.connect(gn);gn.connect(lp);o.start(t0);l.start(t0);o.stop(t0+T+1);l.stop(t0+T+1)});
+if(R.bgm){const sm=ac.createBufferSource();sm.buffer=R.bgm;sm.loop=true;sm.connect(bg);sm.start(t0,Math.random()*Math.max(0,R.bgm.duration-T-1));sm.stop(t0+T+1)}
+const sg=R.segs||[],re=sg.length?Math.max(.3,sg[0][1]-.5):2;bg.gain.setValueAtTime(0,t0);bg.gain.linearRampToValueAtTime(sg.length?.35:.7,t0+re);
+sg.forEach((q,i)=>{const pv=sg[i-1],nx=sg[i+1],st=q[1],en=q[1]+q[0].duration;if(!pv||st-(pv[1]+pv[0].duration)>2.5)bg.gain.setTargetAtTime(.07,t0+Math.max(re,st-.4),.4);if(!nx||nx[1]-en>2.5)bg.gain.setTargetAtTime(.35,t0+en+.3,.5)});
+bg.gain.setTargetAtTime(0,t0+T-2,.6);
+sg.forEach(q=>{const s=ac.createBufferSource();s.buffer=q[0];s.connect(dst);s.start(t0+q[1])});
+const st=cv.captureStream(30);dst.stream.getAudioTracks().forEach(a=>st.addTrack(a));
+const mt=['video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/mp4','video/webm;codecs=vp9,opus','video/webm'].find(m=>window.MediaRecorder&&MediaRecorder.isTypeSupported(m));
+if(!mt){lg('Peramban ini tidak mendukung perekaman video. Pakai Chrome terbaru.');ac.close();return}
+const rc=new MediaRecorder(st,{mimeType:mt,videoBitsPerSecond:2500000}),ch=[];rc.ondataavailable=e=>{if(e.data.size)ch.push(e.data)};const done=new Promise(r=>rc.onstop=r);
+lg('4c Merender video '+T.toFixed(0)+' detik. Berjalan real-time: jangan pindah tab dan jangan tutup halaman.');
+rc.start(500);const t1=performance.now();let ll=0;
+await new Promise(res=>{const loop=()=>{const t=(performance.now()-t1)/1000;draw(g,R,t);if(t-ll>=8){ll=t;lg('    '+Math.min(t,T).toFixed(0)+' / '+T.toFixed(0)+' detik')}if(t<T)requestAnimationFrame(loop);else res()};loop()});
+rc.stop();await done;ac.close();
+const bl=new Blob(ch,{type:mt.split(';')[0]});VID[x.id]={url:URL.createObjectURL(bl),ext:mt.indexOf('mp4')>=0?'mp4':'webm'};await vput(x.id,bl,VID[x.id].ext);lg('Video tersimpan permanen di peramban sampai ditandai sudah diunggah. Video selesai ('+(bl.size/1e6).toFixed(1)+' MB).')}
+$('#vdl').onclick=()=>{const x=S.items.find(i=>i.id==vid),v=VID[vid];if(!v){toast('Video belum jadi. Tekan Generate ulang.');return}const a=document.createElement('a');a.href=v.url;a.download='ngelingan-'+x.date+'-'+x.time.replace(':','')+'.'+v.ext;a.click()};
+const MEM={};
+async function cands(k){if(MEM[k])return MEM[k];
+const pref=(S.cfg[{t:'model',i:'im',s:'tm'}[k]]||'').split(',').map(z=>z.trim()).filter(Boolean);let all=[];
+try{const d=await(await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=200&key='+encodeURIComponent(S.cfg.key))).json();all=(d.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent')).map(m=>m.name.replace('models/',''))}catch(e){}
+const f={t:n=>/flash/.test(n)&&!/image|tts|live|audio|robotics|embed/.test(n),i:n=>/image/.test(n),s:n=>/tts/.test(n)}[k],v=n=>{const m=n.match(/(\d+(?:\.\d+)?)/);return(m?parseFloat(m[1]):0)-(/lite/.test(n)?.05:0)};
+return MEM[k]=[...new Set([...pref,...all.filter(f).sort((a,b)=>v(b)-v(a))])]}
+async function gemAuto(k,body,tmo){const L=await cands(k);let last=new Error('Tidak ada model yang tersedia. Periksa kunci API.');
+for(let i=0;i<L.length;i++){const m=L[i];
+for(let a=0;a<2;a++){let ok=false,retry=false;
+try{const c=new AbortController(),tm=setTimeout(()=>c.abort(),tmo||(k=='t'?45000:120000));
+const r=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(m)+':generateContent?key='+encodeURIComponent(S.cfg.key),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:c.signal});clearTimeout(tm);
+if(r.ok){const d=await r.json();if(i>0){MEM[k]=[m,...L.filter(z=>z!=m)];lg('    Beralih otomatis, model dipakai: '+m)}return d}
+let msg='';try{msg=(await r.json()).error.message}catch(e){}
+if(r.status==401||r.status==403||/API key/i.test(msg))throw Object.assign(new Error('Kunci API ditolak: '+msg.slice(0,100)),{fatal:1});
+last=new Error('HTTP '+r.status+' '+msg.slice(0,90));retry=(r.status==500||r.status==503)&&a==0}
+catch(e){if(e.fatal)throw e;last=e.name=='AbortError'?new Error('waktu habis'):e;retry=e.name!='AbortError'&&a==0}
+if(retry){await sleep(3000);continue}break}
+if(i<L.length-1)lg('    Model '+m+' gagal ('+last.message+'). Mencoba model berikutnya...')}
+throw last}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function notify(m){document.title='✅ '+m;try{if(window.Notification&&Notification.permission=='granted')new Notification('Ngelingan',{body:m})}catch(e){}toast(m)}
+$('#ga').onclick=async()=>{const t=iso(new Date()),L=S.items.filter(x=>x.date==t&&x.status!='sudah'&&!VID[x.id]).sort((a,b)=>a.time<b.time?-1:1);
+if(!L.length){toast('Tidak ada tugas yang perlu dibuat.');return}
+if(!confirm(L.length+' video akan dibuat berurutan. Jangan pindah tab atau menutup halaman sampai selesai. Lanjut?'))return;
+for(const x of L){await genVideo(x.id)}notify('Semua video hari ini selesai')};
+const DB=()=>new Promise((res,rej)=>{const r=indexedDB.open('ngelingan',1);r.onupgradeneeded=()=>r.result.createObjectStore('vid');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+async function vput(id,blob,ext){try{const d=await DB();await new Promise((res,rej)=>{const t=d.transaction('vid','readwrite');t.objectStore('vid').put({blob,ext},id);t.oncomplete=res;t.onerror=()=>rej(t.error)})}catch(e){toast('Video belum bisa disimpan permanen: '+e.message)}}
+async function vget(id){try{const d=await DB();return await new Promise(res=>{const q=d.transaction('vid').objectStore('vid').get(id);q.onsuccess=()=>res(q.result);q.onerror=()=>res(null)})}catch(e){return null}}
+async function vdel(id){try{const d=await DB();await new Promise(res=>{const t=d.transaction('vid','readwrite');t.objectStore('vid').delete(id);t.oncomplete=res;t.onerror=res})}catch(e){}}
+function dropVid(id){const v=VID[id];if(v){URL.revokeObjectURL(v.url);delete VID[id]}vdel(id)}
+async function restore(){try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+for(const x of S.items){if(x.status=='sudah'){vdel(x.id);continue}const v=await vget(x.id);if(v&&v.blob)VID[x.id]={url:URL.createObjectURL(v.blob),ext:v.ext}}hr()}
+/* ===== PERBAIKAN 1: gambar cadangan, tombol salin log, suara ===== */
+(function(){const A=window.AudioContext;if(A)window.AudioContext=class extends A{constructor(o){super(o);this.resume().catch(()=>{})}}})();
+const pkGet=()=>{try{return localStorage.getItem('ngelingan_pk')||''}catch(e){return ''}};
+(function(){const b=document.createElement('button');b.className='b o';b.id='vlg';b.textContent='Salin log';$('#vre').after(b);
+b.onclick=()=>navigator.clipboard.writeText($('#log').textContent).then(()=>toast('Log tersalin. Tempel ke chat.'),()=>toast('Gagal menyalin. Blok dan salin log secara manual.'))})();
+/* ===== akhir PERBAIKAN 1 ===== */
+/* ===== PERBAIKAN 2: bank latar foto sendiri, sumber qari berlapis, lewati gambar AI saat kuota habis ===== */
+const SCN=['sawah','danau','gunung','pantai','hutan','langit-malam','padang-pasir','hujan','kebun-kelapa','pagi-berkabut','geometri','lentera','interior','perkamen','aurora','karavan','kapal','kota-andalusia','kota-nusantara','kota-utsmani','kota-samarkand','kota-mughal','kota-timbuktu','kota-tiongkok','kota-persia','umum'];
+const BG={open:()=>new Promise((res,rej)=>{const r=indexedDB.open('ngelingan_bg',1);r.onupgradeneeded=()=>r.result.createObjectStore('bg',{keyPath:'id',autoIncrement:true});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}),
+async all(){try{const d=await BG.open();return await new Promise(res=>{const q=d.transaction('bg').objectStore('bg').getAll();q.onsuccess=()=>res(q.result);q.onerror=()=>res([])})}catch(e){return[]}},
+async add(scene,blob){const d=await BG.open();return new Promise(res=>{const t=d.transaction('bg','readwrite');t.objectStore('bg').add({scene,blob});t.oncomplete=res;t.onerror=res})},
+async clear(){const d=await BG.open();return new Promise(res=>{const t=d.transaction('bg','readwrite');t.objectStore('bg').clear();t.oncomplete=res;t.onerror=res})}};
+async function bgInfo(){const a=await BG.all(),c={};a.forEach(x=>c[x.scene]=(c[x.scene]||0)+1);$('#bgi').textContent=a.length?'Tersimpan '+a.length+' foto. '+Object.entries(c).map(e=>e[0]+': '+e[1]).join(', '):'Belum ada foto di bank latar.'}
+(function(){const card=document.createElement('div');card.className='card';
+card.innerHTML='<div class="bar"><h2>Bank latar (ilustrasi sendiri)</h2></div><p class="hint" style="margin-top:0">Unggah ilustrasi alam tegak (portrait), bukan foto realistis. Setiap video memilih gambar yang cocok dengan scene-nya secara acak. Ilustrasi bisa diunduh gratis dari Pixabay (pilih jenis Illustrations dan orientasi Vertical), dan cek lisensi tiap situs.</p><label for="bgs">Scene untuk foto yang akan diunggah</label><select id="bgs">'+SCN.map(s=>'<option>'+s+'</option>').join('')+'</select><div class="row"><button class="b o" id="bga" type="button">Pilih dan tambah foto</button><button class="b o" id="bgc" type="button">Kosongkan bank</button></div><input id="bgf" type="file" accept="image/*" multiple hidden><p class="hint" id="bgi"></p>';
+$('#ex').closest('.card').before(card);
+$('#bga').onclick=()=>$('#bgf').click();
+$('#bgf').onchange=async e=>{const fs=[...e.target.files],sc=$('#bgs').value;let n=0;
+for(const f of fs){try{const im=await createImageBitmap(f),k=Math.min(1,1280/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+await BG.add(sc,await new Promise(r=>c.toBlob(r,'image/jpeg',.85)));n++}catch(x){}}
+e.target.value='';toast(n+' foto ditambahkan ke scene '+sc+'.');bgInfo()};
+$('#bgc').onclick=async()=>{if(confirm('Hapus semua foto di bank latar?')){await BG.clear();bgInfo();toast('Bank latar dikosongkan.')}};bgInfo()})();
+async function fetchQari(x){const q=String(x.ref||'').split(':'),p3=n=>String(n).padStart(3,'0'),id=p3(q[0])+p3(q[1]);
+const L=['https://verses.quran.com/Alafasy/mp3/'+id+'.mp3','https://everyayah.com/data/Alafasy_128kbps/'+id+'.mp3',x.audio];let e0=new Error('tidak ada sumber');
+for(const u of L){if(!u)continue;try{const r=await fetch(u);if(r.ok){lg('    Sumber qari: '+new URL(u).host);return r}e0=new Error('HTTP '+r.status+' dari '+new URL(u).host)}catch(e){e0=new Error(e.message+' ('+new URL(u).host+')')}}
+throw e0}
+/* ===== akhir PERBAIKAN 2 ===== */
+/* ===== PERBAIKAN 3: latar buatan kode (cadangan terakhir) ===== */
+function rngS(s){let h=2166136261;for(const c of String(s))h=Math.imul(h^c.charCodeAt(0),16777619);return()=>{h=(h+0x6D2B79F5)|0;let t=Math.imul(h^h>>>15,1|h);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const hx=c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16)),rg=c=>'rgb('+c.map(Math.round).join(',')+')',mix2=(a,b,t)=>rg(a.map((v,i)=>v+(b[i]-v)*t));
+function initP(R){const r=rngS(R.x.id+R.x.scene),pal=R.pal.map(hx).map(c=>c.map(v=>Math.max(0,Math.min(255,v+(r()-.5)*44))));
+return{pal,mq:r()<.7,mx:100+r()*340,ms:.8+r()*.5,sx:70+r()*400,sy:240+r()*110,L:3+Math.floor(r()*2),lay:Array.from({length:5},(_,i)=>[0,1,2].map(()=>[r()*6.28,.006+r()*.012+i*.004,(20+r()*45)*(1-i*.1)])),st:Array.from({length:80},()=>[r()*540,r()*420,.6+r()*1.4,r()*6]),tr:Array.from({length:14},()=>[r()*540,r(),r()*6.28])}}
+function procBG(g,R,t){const W=540,H=960,P=R.pg||(R.pg=initP(R)),sc=R.x.scene,pl=P.pal,night=sc=='langit-malam',sea=sc=='pantai'||sc=='danau';let q;
+q=g.createLinearGradient(0,0,0,H*.65);q.addColorStop(0,rg(pl[0]));q.addColorStop(1,rg(pl[1]));g.fillStyle=q;g.fillRect(0,0,W,H);
+q=g.createRadialGradient(P.sx,P.sy,4,P.sx,P.sy,night?90:230);q.addColorStop(0,night?'rgba(235,240,255,.95)':'rgba(255,240,190,.95)');q.addColorStop(.25,night?'rgba(200,210,255,.3)':'rgba(255,200,120,.45)');q.addColorStop(1,'rgba(255,200,120,0)');g.fillStyle=q;g.fillRect(0,0,W,H);
+if(night){P.st.forEach(s=>{g.globalAlpha=.4+.6*Math.abs(Math.sin(t*s[2]+s[3]));g.fillStyle='#fff';g.fillRect(s[0],s[1],s[2],s[2])});g.globalAlpha=1}
+for(let i=0;i<P.L;i++){const by=H*(.43+.06*i);g.fillStyle=mix2(pl[2],pl[1],.62-i*.16);g.beginPath();g.moveTo(0,H);for(let x=0;x<=W;x+=6){let y=by;P.lay[i].forEach(k=>y-=k[2]*Math.sin(x*k[1]+k[0])*.7);g.lineTo(x,y)}g.lineTo(W,H);g.fill();if(i==1&&P.mq)mosque(g,P,pl,by)}
+if(sea){const y0=H*.58;q=g.createLinearGradient(0,y0,0,H);q.addColorStop(0,rg(pl[1]));q.addColorStop(1,rg(pl[2].map(v=>v*.7)));g.fillStyle=q;g.fillRect(0,y0,W,H-y0);g.strokeStyle='rgba(255,255,255,.16)';g.lineWidth=2;
+for(let j=0;j<26;j++){const y=y0+8+j*j*.55+j*7;g.beginPath();for(let x=0;x<=W;x+=12){const yy=y+Math.sin(x*.03+t*(.8+j*.04)+j)*(1+j*.18);x?g.lineTo(x,yy):g.moveTo(x,yy)}g.stroke()}}
+else{const y0=H*.66;q=g.createLinearGradient(0,y0,0,H);q.addColorStop(0,mix2(pl[2],pl[1],.35));q.addColorStop(1,rg(pl[2].map(v=>v*.55)));g.fillStyle=q;g.fillRect(0,y0,W,H-y0);
+if(sc!='padang-pasir'&&sc!='hujan'&&!night){for(let b=0;b<170;b++){const x=(b*37.7)%W,y=H*.7+((b*61.3)%(H*.3)),d=(y-H*.7)/H,h=14+d*120,w=Math.sin(t*1.4+x*.02+b)*(2+d*30);g.strokeStyle=mix2(pl[2],[160,190,90],.25+d*.5);g.lineWidth=1.5+d*12;g.beginPath();g.moveTo(x,y);g.quadraticCurveTo(x+w*.5,y-h*.6,x+w,y-h);g.stroke()}}}
+if(sc=='kebun-kelapa'||sc=='hutan'){P.tr.forEach(a=>{const x=a[0],by=H*(.68+a[1]*.12),h=(sc=='hutan'?200:260)*(.6+a[1]*.8);g.strokeStyle='rgba(15,25,18,.85)';g.fillStyle='rgba(15,28,20,.88)';
+if(sc=='hutan'){g.beginPath();g.moveTo(x-h*.18,by);g.lineTo(x,by-h);g.lineTo(x+h*.18,by);g.fill()}
+else{g.lineWidth=5;g.beginPath();g.moveTo(x,by);g.quadraticCurveTo(x+12,by-h*.5,x+4,by-h);g.stroke();g.lineWidth=3;for(let f=0;f<6;f++){const an=-1.2+f*.5+Math.sin(t*1.1+a[2])*.05;g.beginPath();g.moveTo(x+4,by-h);g.quadraticCurveTo(x+4+Math.cos(an)*46,by-h+Math.sin(an)*30-14,x+4+Math.cos(an)*74,by-h+Math.sin(an)*60);g.stroke()}}})}
+if(sc=='hujan'){g.strokeStyle='rgba(220,230,240,.35)';g.lineWidth=1.2;for(let k=0;k<120;k++){const x=(k*47.3)%W,y=((k*83.1)+t*(500+(k%5)*60))%H;g.beginPath();g.moveTo(x,y);g.lineTo(x-4,y+22);g.stroke()}}
+q=g.createLinearGradient(0,H*.5,0,H*.72);q.addColorStop(0,'rgba(255,255,255,0)');q.addColorStop(.5,'rgba(255,245,230,.22)');q.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=q;g.fillRect(0,H*.5,W,H*.22)}
+/* ===== akhir PERBAIKAN 3 ===== */
+/* ===== PERBAIKAN 4: judul ajakan di atas video, Pixabay, aturan konten, jenis baru ===== */
+const AJK={Ayat:['Luangkan waktu sejenak, baca 1 ayat untuk hari ini','Sebelum sibuk, baca satu ayat dulu ya','Satu ayat untuk menenangkan hati hari ini','Yuk, awali hari dengan membaca ayat Al-Quran'],'Doa harian':['Mari berdoa pada hari ini agar diberkahi','Jangan lupa berdoa hari ini, semoga diberkahi','Luangkan waktu sejenak untuk berdoa hari ini'],'Asmaul Husna':['Kenali Allah lewat satu nama-Nya hari ini','Satu nama Allah untuk direnungkan hari ini']};
+const pxGet=()=>{try{return localStorage.getItem('ngelingan_pxb')||''}catch(e){return ''}};
+(function(){const k=$('#sk').previousElementSibling,d=document.createElement('div');
+d.innerHTML='<label for="spx">Kunci API Pixabay (foto stok, cadangan gambar)</label><input id="spx" type="password" autocomplete="off" placeholder="opsional, gratis di pixabay.com/api/docs"><p class="hint">Dipakai otomatis kalau gambar AI gagal dan bank latar kosong. Tersimpan otomatis saat ditempel.</p>';
+k.before(d);const i=$('#spx');i.value=pxGet();i.oninput=()=>{try{localStorage.setItem('ngelingan_pxb',i.value.trim())}catch(e){}}})();
+async function pixabayImg(x){const key=pxGet();if(!key)return null;
+const Q={sawah:'rice field sunrise',danau:'calm lake mist morning',gunung:'mountain sunrise clouds',pantai:'beach sunset waves','langit-malam':'night sky stars','padang-pasir':'desert dunes sunset',hujan:'rain drops leaves','kebun-kelapa':'coconut palm sunset',hutan:'forest sunlight rays','pagi-berkabut':'misty morning landscape'}[x.scene]||'nature landscape sunrise';
+lg('    Mengambil foto Pixabay: '+Q);
+const r=await fetch('https://pixabay.com/api/?key='+encodeURIComponent(key)+'&q='+encodeURIComponent(Q)+'&image_type=illustration&orientation=vertical&safesearch=true&per_page=40&page='+(1+Math.floor(Math.random()*2)));
+if(!r.ok)throw new Error('Pixabay HTTP '+r.status);
+const h=(await r.json()).hits||[];if(!h.length)throw new Error('Pixabay tidak menemukan foto');
+const p=h[Math.floor(Math.random()*h.length)],m=await fetch(p.largeImageURL||p.webformatURL);if(!m.ok)throw new Error('unduh foto gagal '+m.status);
+lg('    Ilustrasi Pixabay dipakai (pengunggah: '+(p.user||'-')+').');return createImageBitmap(await m.blob())}
+/* ===== akhir PERBAIKAN 4 ===== */
+/* ===== PERBAIKAN 5: sumber hadits berlapis, backsound dari bank (Pixabay Music manual), latar ilustrasi, masjid ===== */
+
+const BGM={open:()=>new Promise((res,rej)=>{const r=indexedDB.open('ngelingan_bgm',1);r.onupgradeneeded=()=>r.result.createObjectStore('m',{keyPath:'id',autoIncrement:true});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}),
+async all(){try{const d=await BGM.open();return await new Promise(res=>{const q=d.transaction('m').objectStore('m').getAll();q.onsuccess=()=>res(q.result);q.onerror=()=>res([])})}catch(e){return[]}},
+async add(name,blob){const d=await BGM.open();return new Promise(res=>{const t=d.transaction('m','readwrite');t.objectStore('m').add({name,blob});t.oncomplete=res;t.onerror=res})},
+async clear(){const d=await BGM.open();return new Promise(res=>{const t=d.transaction('m','readwrite');t.objectStore('m').clear();t.oncomplete=res;t.onerror=res})}};
+async function pickBgm(ac){const a=await BGM.all();if(!a.length)return null;const p=a[Math.floor(Math.random()*a.length)];return await ac.decodeAudioData(await p.blob.arrayBuffer())}
+async function bgmInfo(){const a=await BGM.all();$('#bmi').textContent=a.length?'Tersimpan '+a.length+' lagu: '+a.map(x=>x.name).join(', '):'Belum ada musik. Video memakai nada dasar buatan kode.'}
+(function(){const card=document.createElement('div');card.className='card';
+card.innerHTML='<div class="bar"><h2>Bank backsound (musik islami)</h2></div><p class="hint" style="margin-top:0">Pixabay tidak menyediakan API untuk musik, jadi unduh dulu secara manual dari pixabay.com/music. Cari kata kunci seperti islamic ambient, nasheed instrumental, atau arabic calm, pilih yang instrumental (tanpa vokal), lalu unggah di sini. Musik dipilih acak untuk setiap video, volumenya turun otomatis saat qari atau suara dibacakan. Cek lisensi tiap lagu.</p><div class="row"><button class="b o" id="bma" type="button">Pilih dan tambah musik</button><button class="b o" id="bmc" type="button">Kosongkan</button></div><input id="bmf" type="file" accept="audio/*" multiple hidden><p class="hint" id="bmi"></p>';
+$('#bgi').closest('.card').before(card);
+$('#bma').onclick=()=>$('#bmf').click();
+$('#bmf').onchange=async e=>{let n=0;for(const f of [...e.target.files]){try{await BGM.add(f.name,f);n++}catch(x){}}e.target.value='';toast(n+' lagu ditambahkan.');bgmInfo()};
+$('#bmc').onclick=async()=>{if(confirm('Hapus semua musik di bank backsound?')){await BGM.clear();bgmInfo()}};bgmInfo()})();
+(function(){const d=document.createElement('div');
+d.innerHTML='<label for="bgsrc">Sumber latar video</label><select id="bgsrc"><option value="kode">Ilustrasi buatan kode (pilihan awal)</option><option value="campur">Campur: bank latar dan Pixabay (ilustrasi)</option><option value="unggah">Hanya dari bank latar</option></select><p class="hint">Ilustrasi buatan kode cepat dan berbeda di tiap video. Pilihan lain menambah variasi dari gambar ilustrasi yang kamu unggah atau dari Pixabay.</p>';
+$('#bgs').previousElementSibling.before(d);const s=$('#bgsrc');try{s.value=localStorage.getItem('ngelingan_bgsrc')||'kode'}catch(e){}s.onchange=()=>{try{localStorage.setItem('ngelingan_bgsrc',s.value)}catch(e){}}})();
+async function getImg(x){let src='kode';try{src=localStorage.getItem('ngelingan_bgsrc')||'kode'}catch(e){}
+if(src=='kode')return null;
+const a=await BG.all(),m=a.filter(z=>z.scene==x.scene),u=a.filter(z=>z.scene=='umum'),pool=m.length?m:(u.length?u:a),pk=()=>createImageBitmap(pool[Math.floor(Math.random()*pool.length)].blob);
+if(pool.length&&(src=='unggah'||Math.random()<.5)){lg('    Memakai ilustrasi dari bank latar ('+(m.length?'scene '+x.scene:'scene lain')+').');return pk()}
+if(src=='campur'){try{const im=await pixabayImg(x);if(im)return im}catch(e){lg('    Pixabay gagal: '+String(e.message).slice(0,120))}}
+return pool.length?pk():null}
+function mosque(g,P,pl,by){let y=by;P.lay[1].forEach(k=>y-=k[2]*Math.sin(P.mx*k[1]+k[0])*.7);const x0=P.mx,s=P.ms;g.fillStyle=mix2(pl[2],pl[1],.5);
+g.fillRect(x0-34*s,y-30*s,68*s,36*s);g.beginPath();g.arc(x0,y-30*s,26*s,Math.PI,0);g.fill();g.fillRect(x0-1.5*s,y-70*s,3*s,16*s);
+[-52,52].forEach(d=>{const cx=x0+d*s;g.fillRect(cx-4*s,y-78*s,8*s,84*s);g.beginPath();g.moveTo(cx-6*s,y-78*s);g.lineTo(cx,y-98*s);g.lineTo(cx+6*s,y-78*s);g.fill()})}
+/* ===== akhir PERBAIKAN 5 ===== */
+/* ===== PERBAIKAN 6: render cepat (WebCodecs) dengan file MP4 yang durasi dan suaranya benar ===== */
+function mp4Mux(o){const U=(...a)=>Uint8Array.from(a),cat=l=>{let n=0;l.forEach(x=>n+=x.length);const r=new Uint8Array(n);let p=0;l.forEach(x=>{r.set(x,p);p+=x.length});return r},
+W4=n=>U(n>>>24&255,n>>>16&255,n>>>8&255,n&255),W2=n=>U(n>>8&255,n&255),S=s=>U(...[...s].map(c=>c.charCodeAt(0))),Z=n=>new Uint8Array(n),
+bx=(t,...c)=>{const b=cat(c);return cat([W4(b.length+8),S(t),b])},fb=(t,v,f,...c)=>bx(t,U(v,f>>16&255,f>>8&255,f&255),...c),
+MAT=cat([W4(65536),Z(12),W4(65536),Z(12),W4(0x40000000)]);
+const trak=(id,kind,ts,dur,sizes,deltas,sync,entry,off,w,h)=>{const n=sizes.length,runs=[];deltas.forEach(d=>{const l=runs[runs.length-1];if(l&&l[1]==d)l[0]++;else runs.push([1,d])});
+const stbl=bx('stbl',fb('stsd',0,0,W4(1),entry),fb('stts',0,0,W4(runs.length),...runs.map(r=>cat([W4(r[0]),W4(r[1])]))),sync?fb('stss',0,0,W4(sync.length),...sync.map(W4)):Z(0),fb('stsc',0,0,W4(1),W4(1),W4(n),W4(1)),fb('stsz',0,0,W4(0),W4(n),...sizes.map(W4)),fb('stco',0,0,W4(1),W4(off)));
+const minf=bx('minf',kind=='vide'?fb('vmhd',0,1,Z(8)):fb('smhd',0,0,Z(4)),bx('dinf',fb('dref',0,0,W4(1),fb('url ',0,1))),stbl);
+const mdia=bx('mdia',fb('mdhd',0,0,W4(0),W4(0),W4(ts),W4(dur),W2(0x55C4),W2(0)),fb('hdlr',0,0,W4(0),S(kind),Z(12),S(kind=='vide'?'VideoHandler':'SoundHandler'),Z(1)),minf);
+return bx('trak',fb('tkhd',0,3,W4(0),W4(0),W4(id),W4(0),W4(Math.round(dur/ts*1000)),Z(8),W2(0),W2(0),W2(kind=='soun'?256:0),W2(0),MAT,W4(w<<16),W4(h<<16)),mdia)};
+const hasV=o.vs&&o.vs.length,hasA=o.a&&o.a.fr&&o.a.fr.length;let ve,vsz=[],vdel=[],sync=[],vdur=0,ae,asz=[],adel=[],adur=0,ats=0;
+if(hasV){ve=bx('avc1',Z(6),W2(1),Z(16),W2(o.w),W2(o.h),W4(0x00480000),W4(0x00480000),W4(0),W2(1),Z(32),W2(24),W2(0xFFFF),bx('avcC',o.vdesc));
+o.vs.forEach((s,i)=>{vsz.push(s.d.length);vdel.push(3000);if(s.k)sync.push(i+1)});vdur=3000*o.vs.length}
+if(hasA){const a=o.a;if(a.codec=='aac'){const d=a.desc,dsi=cat([U(5,d.length),d]),dcd=cat([U(4,13+dsi.length),U(0x40,0x15),Z(3),W4(0),W4(0),dsi]),slc=U(6,1,2),es=cat([U(3,3+dcd.length+slc.length),W2(0),U(0),dcd,slc]);
+ae=bx('mp4a',Z(6),W2(1),Z(8),W2(a.ch),W2(16),W2(0),W2(0),W4((a.sr*65536)>>>0),fb('esds',0,0,es));ats=a.sr;a.fr.forEach(f=>{asz.push(f.d.length);adel.push(1024)})}
+else{ae=bx('Opus',Z(6),W2(1),Z(8),W2(a.ch),W2(16),W2(0),W2(0),W4((48000*65536)>>>0),bx('dOps',U(0,a.ch),W2(a.pre||312),W4(a.sr),W2(0),U(0)));ats=48000;a.fr.forEach(f=>{asz.push(f.d.length);adel.push(Math.max(1,Math.round(f.dur*48000/1e6)))})}
+adur=adel.reduce((p,c)=>p+c,0)}
+const ftyp=bx('ftyp',S('isom'),W4(512),S('isom'),S('iso2'),S('avc1'),S('mp41')),dms=Math.max(vdur/90000,ats?adur/ats:0)*1000;
+const moov=(vo,ao)=>bx('moov',fb('mvhd',0,0,W4(0),W4(0),W4(1000),W4(Math.round(dms)),W4(65536),W2(256),Z(10),MAT,Z(24),W4(3)),...(hasV?[trak(1,'vide',90000,vdur,vsz,vdel,sync,ve,vo,o.w,o.h)]:[]),...(hasA?[trak(hasV?2:1,'soun',ats,adur,asz,adel,null,ae,ao,0,0)]:[]));
+const m0=moov(0,0),base=ftyp.length+m0.length+8,vb=vsz.reduce((p,c)=>p+c,0),m=moov(base,base+vb);
+return cat([ftyp,m,bx('mdat',...(hasV?o.vs.map(s=>s.d):[]),...(hasA?o.a.fr.map(f=>f.d):[]))])}
+const yieldNow=()=>new Promise(r=>{const c=new MessageChannel();c.port1.onmessage=()=>r();c.port2.postMessage(0)});
+function mixAudio(oc,R,bA,bI,tA0,tB0,T){const bg=oc.createGain(),lp=oc.createBiquadFilter();bg.gain.value=0;bg.connect(oc.destination);lp.type='lowpass';lp.frequency.value=700;lp.connect(bg);
+if(R.bgm){const s=oc.createBufferSource();s.buffer=R.bgm;s.loop=true;s.connect(bg);s.start(0,Math.random()*Math.max(0,R.bgm.duration-T-1));s.stop(T+1)}
+else[[73.4,.09],[110,.07],[146.8,.06],[220,.03],[293.7,.02]].forEach((q,k)=>{const o=oc.createOscillator(),gn=oc.createGain(),l=oc.createOscillator(),lq=oc.createGain();o.type='sine';o.frequency.value=q[0];gn.gain.value=q[1];l.frequency.value=.05+k*.02;lq.gain.value=q[1]*.4;l.connect(lq);lq.connect(gn.gain);o.connect(gn);gn.connect(lp);o.start(0);l.start(0);o.stop(T+1);l.stop(T+1)});
+const sg=R.segs||[],re=sg.length?Math.max(.3,sg[0][1]-.5):2;bg.gain.setValueAtTime(0,0);bg.gain.linearRampToValueAtTime(sg.length?.35:.7,re);
+sg.forEach((q,i)=>{const pv=sg[i-1],nx=sg[i+1],st=q[1],en=q[1]+q[0].duration;if(!pv||st-(pv[1]+pv[0].duration)>2.5)bg.gain.setTargetAtTime(.07,Math.max(re,st-.4),.4);if(!nx||nx[1]-en>2.5)bg.gain.setTargetAtTime(.35,en+.3,.5)});
+bg.gain.setTargetAtTime(0,Math.max(0,T-2),.6);
+sg.forEach(q=>{const s=oc.createBufferSource();s.buffer=q[0];s.connect(oc.destination);s.start(q[1])})}
+async function offlineRender(R,g,cv,bA,bI,tA0,tB0,x){
+if(!(window.VideoEncoder&&window.AudioEncoder&&window.OfflineAudioContext&&window.VideoFrame&&window.AudioData))return null;
+const fps=30,T=R.T,n=Math.ceil(T*fps),sr=48000,ch=2,vc={codec:'avc1.42001f',width:540,height:960,bitrate:2500000,framerate:fps,avc:{format:'avc'}};
+if(!(await VideoEncoder.isConfigSupported(vc)).supported)return null;
+let ac1={codec:'mp4a.40.2',sampleRate:sr,numberOfChannels:ch,bitrate:128000,aac:{format:'aac'}},aac=true;
+if(!(await AudioEncoder.isConfigSupported(ac1)).supported){ac1={codec:'opus',sampleRate:sr,numberOfChannels:ch,bitrate:128000};aac=false;if(!(await AudioEncoder.isConfigSupported(ac1)).supported)return null}
+lg('    Render cepat tanpa perekaman real-time. Audio: '+(aac?'AAC (kompatibel luas).':'Opus (AAC tidak didukung peramban ini; beberapa pemutar bawaan HP mungkin tidak bisa memutarnya).'));
+let err=null;const cp=d=>d instanceof ArrayBuffer?new Uint8Array(d.slice(0)):new Uint8Array(d.buffer.slice(d.byteOffset,d.byteOffset+d.byteLength));
+const oc=new OfflineAudioContext(ch,Math.ceil(T*sr),sr);mixAudio(oc,R,bA,bI,tA0,tB0,T);const mix=await oc.startRendering();
+let adesc=null;const afr=[],aenc=new AudioEncoder({output:(c,m)=>{if(m&&m.decoderConfig&&m.decoderConfig.description)adesc=cp(m.decoderConfig.description);const d=new Uint8Array(c.byteLength);c.copyTo(d);afr.push({d,dur:c.duration})},error:e=>err=e});
+aenc.configure(ac1);const L=mix.getChannelData(0),Rr=mix.getChannelData(1),B=4096;
+for(let p=0;p<L.length;p+=B){const k=Math.min(B,L.length-p),d=new Float32Array(k*2);d.set(L.subarray(p,p+k),0);d.set(Rr.subarray(p,p+k),k);aenc.encode(new AudioData({format:'f32-planar',sampleRate:sr,numberOfFrames:k,numberOfChannels:2,timestamp:Math.round(p/sr*1e6),data:d}));while(aenc.encodeQueueSize>20)await sleep(2);if(err)throw err}
+await aenc.flush();if(err)throw err;
+let vdesc=null;const vs=[],venc=new VideoEncoder({output:(c,m)=>{if(m&&m.decoderConfig&&m.decoderConfig.description)vdesc=cp(m.decoderConfig.description);const d=new Uint8Array(c.byteLength);c.copyTo(d);vs.push({d,k:c.type=='key'})},error:e=>err=e});
+venc.configure(vc);
+for(let i=0;i<n;i++){draw(g,R,i/fps);const f=new VideoFrame(cv,{timestamp:Math.round(i*1e6/fps),duration:Math.round(1e6/fps)});venc.encode(f,{keyFrame:i%60==0});f.close();while(venc.encodeQueueSize>6)await sleep(2);if(i%15==0){await yieldNow();if(i%150==0&&i)lg('    '+(i/fps).toFixed(0)+' / '+T.toFixed(0)+' detik')}if(err)throw err}
+await venc.flush();if(err)throw err;if(!vs.length||!vdesc||!afr.length)throw new Error('encoder tidak menghasilkan data');
+if(aac&&!adesc)adesc=Uint8Array.from([0x11,0x90]);let pre=312;if(!aac&&adesc&&adesc.length>11&&adesc[0]==79)pre=adesc[10]|(adesc[11]<<8);
+return new Blob([mp4Mux({w:540,h:960,vdesc,vs,a:{codec:aac?'aac':'opus',sr,ch,desc:adesc,fr:afr,pre}})],{type:'video/mp4'})}
+/* ===== akhir PERBAIKAN 6 ===== */
+/* ===== PERBAIKAN 7: ilustrasi detail buatan kode (gaya vektor datar) ===== */
+const gr2=(g,y0,y1,st)=>{const q=g.createLinearGradient(0,y0,0,y1);st.forEach(s=>q.addColorStop(s[0],s[1]));return q};
+const wv=(r,n,a,f)=>{const k=Array.from({length:n},()=>[r()*6.28,f*(.6+r()*1.2),a*(.4+r()*.6)]);return x=>k.reduce((s,q)=>s+q[2]*Math.sin(x*q[1]+q[0]),0)};
+const hillF=(g,fy,y0,col)=>{g.fillStyle=col;g.beginPath();g.moveTo(0,960);for(let x=0;x<=540;x+=5)g.lineTo(x,y0-fy(x));g.lineTo(540,960);g.fill()};
+const poly=(g,p,c)=>{g.fillStyle=c;g.beginPath();g.moveTo(p[0][0],p[0][1]);for(let i=1;i<p.length;i++)g.lineTo(p[i][0],p[i][1]);g.closePath();g.fill()};
+function treeLine(g,r,y,h,col,n){g.fillStyle=col;for(let i=0;i<n;i++){const x=r()*580-20,s=h*(.55+r()*.7);g.beginPath();g.ellipse(x,y-s*.45,s*.6,s*.55,0,0,6.3);g.fill()}g.fillRect(0,y-2,540,960)}
+function pine(g,x,y,s,col){g.fillStyle=col;for(let i=0;i<4;i++){const by=y-s*(.12+i*.2),w=s*(.3-i*.055);g.beginPath();g.moveTo(x-w,by);g.lineTo(x,by-s*.42);g.lineTo(x+w,by);g.closePath();g.fill()}g.fillRect(x-s*.02,y-s*.12,s*.04,s*.14)}
+function pineRow(g,r,y,step,s,col){for(let x=-20;x<580;x+=step)pine(g,x+r()*step*.6,y+(r()-.5)*10,s*(.7+r()*.6),col)}
+function palm(g,x,y,h,col,ln){g.strokeStyle=col;g.fillStyle=col;g.lineCap='round';g.lineWidth=Math.max(2,h*.03);const tx=x+ln*h*.28,ty=y-h;g.beginPath();g.moveTo(x,y);g.quadraticCurveTo(x+ln*h*.04,y-h*.55,tx,ty);g.stroke();
+for(let f=0;f<8;f++){const a=-Math.PI/2+(f-3.5)*.52+ln*.15,L=h*(.3+.06*(f%2));g.beginPath();g.moveTo(tx,ty);g.quadraticCurveTo(tx+Math.cos(a)*L*.55,ty+Math.sin(a)*L*.55-L*.3,tx+Math.cos(a)*L,ty+Math.sin(a)*L+L*.28);g.quadraticCurveTo(tx+Math.cos(a)*L*.5,ty+Math.sin(a)*L*.5-L*.06,tx,ty);g.fill()}}
+function hut(g,x,y,s,roof,wall,dk){g.fillStyle=wall;g.fillRect(x-s*.5,y-s*.38,s,s*.38);g.fillStyle=dk;g.fillRect(x-s*.1,y-s*.26,s*.2,s*.26);poly(g,[[x-s*.72,y-s*.36],[x-s*.3,y-s*.88],[x+s*.3,y-s*.88],[x+s*.72,y-s*.36]],roof);g.strokeStyle='rgba(0,0,0,.2)';g.lineWidth=1;for(let i=0;i<7;i++){g.beginPath();g.moveTo(x-s*.68+i*s*.2,y-s*.37);g.lineTo(x-s*.28+i*s*.093,y-s*.87);g.stroke()}}
+function saung(g,x,y,s,roof,post,stone){g.fillStyle=stone;g.fillRect(x-s*.6,y-s*.1,s*1.2,s*.1);g.fillRect(x-s*.5,y-s*.2,s,s*.1);g.fillStyle=post;[-.42,-.14,.14,.42].forEach(d=>g.fillRect(x+d*s-s*.022,y-s*.95,s*.044,s*.77));
+poly(g,[[x-s*.82,y-s*.9],[x-s*.3,y-s*1.5],[x+s*.3,y-s*1.5],[x+s*.82,y-s*.9]],roof);poly(g,[[x-s*.7,y-s*.92],[x+s*.7,y-s*.92],[x+s*.32,y-s*1.2],[x-s*.32,y-s*1.2]],'rgba(0,0,0,.4)');g.strokeStyle='rgba(0,0,0,.22)';g.lineWidth=1.2;for(let i=0;i<9;i++){g.beginPath();g.moveTo(x-s*.8+i*s*.2,y-s*.9);g.lineTo(x-s*.28+i*s*.07,y-s*1.49);g.stroke()}}
+function cloudSp(r,w,h,c1,c2){const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d'),n=6+Math.floor(r()*3),bl=h*.82;g.beginPath();for(let i=0;i<n;i++){const cx=w*(.14+.72*i/(n-1)),rad=h*(.24+.2*Math.sin(Math.PI*i/(n-1))+r()*.07);g.moveTo(cx+rad,bl-rad);g.arc(cx,bl-rad,rad,0,6.3)}g.rect(w*.1,bl-h*.2,w*.8,h*.2);g.save();g.clip();g.fillStyle=c1;g.fillRect(0,0,w,h);g.globalAlpha=.55;g.fillStyle=c2;g.fillRect(0,bl-h*.24,w,h);g.restore();return c}
+function mtn(g,r,cx,by,w,h,cl,cd,sn,sd){const n=8,Lp=[],Rp=[],Rg=[];for(let i=0;i<=n;i++){const t=i/n,j=(1-t)*12;Lp.push([cx-w/2+(w/2)*t+(r()-.5)*j,by-h*Math.pow(t,.85)+(r()-.5)*j*.6]);Rp.push([cx+w/2-(w/2)*t+(r()-.5)*j,by-h*Math.pow(t,.85)+(r()-.5)*j*.6]);Rg.push([cx+(r()-.5)*w*.12*(1-t)+w*.02*(1-t),by-h*t])}
+Lp[n]=Rp[n]=Rg[n]=[cx,by-h];poly(g,[...Lp,...Rg.slice(0,n).reverse()],cl);poly(g,[...Rg,...Rp.slice(0,n).reverse()],cd);
+for(let i=1;i<n-1;i++)if(r()<.7){poly(g,[Lp[i],Rg[i],Lp[i+1]],'rgba(255,255,255,.14)');poly(g,[Rg[i],Rp[i],Rp[i+1]],'rgba(0,0,40,.14)')}
+if(sn){const zz=(a,b)=>[0,1,2].map(k=>[a[0]+(b[0]-a[0])*(k+1)/4,a[1]+(b[1]-a[1])*(k+1)/4+(k%2?-16:14)]);poly(g,[...Lp.slice(4),...Rg.slice(4,n).reverse(),...zz(Rg[4],Lp[4])],sn);poly(g,[...Rg.slice(4),...Rp.slice(4,n).reverse(),...zz(Rp[4],Rg[4])],sd||sn)}}
+function lakeFx(g,r,wy,c1,c2){g.save();g.beginPath();g.rect(0,wy,540,960-wy);g.clip();g.translate(0,2*wy);g.scale(1,-1);g.globalAlpha=.6;g.drawImage(g.canvas,0,0);g.restore();g.globalAlpha=.55;g.fillStyle=gr2(g,wy,960,[[0,c1],[1,c2]]);g.fillRect(0,wy,540,960-wy);g.globalAlpha=1;
+for(let i=0;i<90;i++){const y=wy+4+Math.pow(r(),1.5)*(960-wy-8),x=r()*540,l=20+r()*100;g.fillStyle='rgba(255,255,255,'+(.08+r()*.2)+')';g.fillRect(x,y,l,1.5+(y-wy)/120)}}
+function bird(g,x,y,s,t,col,eagle){const f=Math.sin(t*(eagle?3:9));g.fillStyle=col;g.beginPath();g.moveTo(x,y);g.quadraticCurveTo(x-s*.6,y-s*(.5+.35*f),x-s*1.3,y+s*(.1+.25*f));g.quadraticCurveTo(x-s*.6,y+s*.05,x,y+s*.1);g.quadraticCurveTo(x+s*.6,y+s*.05,x+s*1.3,y+s*(.1+.25*f));g.quadraticCurveTo(x+s*.6,y-s*(.5+.35*f),x,y);g.fill();if(eagle){g.fillStyle='#fff';g.beginPath();g.arc(x+s*.02,y-s*.06,s*.1,0,6.3);g.fill()}}
+function sunGlow(g,x,y,r0,a){const q=g.createRadialGradient(x,y,2,x,y,r0);q.addColorStop(0,'rgba(255,250,215,'+a+')');q.addColorStop(.3,'rgba(255,235,170,'+a*.4+')');q.addColorStop(1,'rgba(255,235,170,0)');g.fillStyle=q;g.fillRect(0,0,540,960)}
+function scPaddy(g,r,R,sc,addCloud,pick){const W=540,H=960,hz=H*(.62+r()*.04),P=sc=='hujan'?[['#6d7f8f','#a9b7bf','#d7dde0']]:sc=='kebun-kelapa'?[['#4d5a8f','#e58f6a','#ffc77a'],['#a96a9a','#f2a273','#ffd58a']]:[['#8fb88a','#d8d98f','#f6e7a6'],['#9db6cb','#f1cba2','#ffe4b2'],['#7fb0c8','#efd08a','#fff0b8'],['#a6b88a','#e8d891','#fff1b5']],p=pick(P),h3=hx(p[2]);
+g.fillStyle=gr2(g,0,hz,[[0,p[0]],[.5,p[1]],[1,p[2]]]);g.fillRect(0,0,W,H);sunGlow(g,60+r()*420,hz-90-r()*150,180,.9);
+for(let i=0;i<4;i++)treeLine(g,r,hz-6+i*7,34+i*10,mix2([60,110,95],h3,.62-i*.15),16+i*4);
+const np=sc=='kebun-kelapa'?7:4;for(let i=0;i<np;i++)palm(g,30+r()*480,hz+2+r()*16,150+r()*150,mix2([28,62,48],h3,.18+r()*.15),(r()-.5)*1.6);
+for(let i=0;i<2;i++)hut(g,60+r()*420,hz+14+r()*10,46+r()*22,mix2([120,85,55],h3,.2),mix2([205,170,125],h3,.25),mix2([90,70,50],h3,.2));
+treeLine(g,r,hz+16,40,mix2([55,100,80],h3,.35),12);
+const N=22,gc=sc=='hujan'?[[110,150,110],[90,130,95]]:[[132,210,80],[92,176,58],[160,225,90]];
+for(let i=0;i<N;i++){const t0=Math.pow(i/N,1.9),t1=Math.pow((i+1)/N,1.9),y0=hz+(H-hz)*t0,y1=hz+(H-hz)*t1+1;g.fillStyle=mix2(gc[i%gc.length],h3,Math.max(0,.75-t0*1.5));g.fillRect(0,y0,W,y1-y0);g.fillStyle='rgba(20,80,25,'+(.12+t0*.2)+')';g.fillRect(0,y1-1-t1*2,W,1+t1*2.5)}
+g.strokeStyle='rgba(30,100,35,.18)';g.lineWidth=1.5;for(let i=0;i<22;i++){const x=r()*W;g.beginPath();g.moveTo(270+(x-270)*.05,hz);g.lineTo(x*1.3-80,H);g.stroke()}
+for(let i=0;i<10;i++){const y=hz+30+Math.pow(r(),1.4)*(H-hz-120);g.fillStyle='rgba(255,235,190,.18)';g.fillRect(r()*W,y,40+r()*140,2+(y-hz)/90)}
+saung(g,r()<.5?125+r()*60:355+r()*60,H*.895,150+r()*40,'#7a5a3a','#5e452d','#8a8070');
+g.fillStyle='rgba(60,120,40,.9)';for(let i=0;i<60;i++)g.fillRect(r()*W,H-r()*60,2,14+r()*20);
+const q=g.createLinearGradient(0,hz-60,0,hz+80);q.addColorStop(0,'rgba(255,245,215,0)');q.addColorStop(.5,'rgba(255,245,215,.28)');q.addColorStop(1,'rgba(255,245,215,0)');g.fillStyle=q;g.fillRect(0,hz-60,W,140);
+addCloud(3,50,250,sc=='hujan'?'#cfd6da':'#fff8e6',sc=='hujan'?'#8b98a1':rg(hx(p[1])),0);R.kind=sc=='hujan'?'rain':'paddy'}
+function scMtn(g,r,R,sc,addCloud,pick){const W=540,H=960,wy=H*(.7+r()*.05),PS={day:[['#2a86dc','#6ec0f2','#c3e8fb'],'#eef6ff','#a9c8f0','#5f86cf','#27408f'],dawn:[['#5a64a8','#e8a2a2','#ffd9a6'],'#fff0ea','#e6b3c0','#9b78b4','#3a3a7a'],gold:[['#4f8fc4','#f0c27a','#ffe3a8'],'#fff6e2','#e8c690','#8a8ab8','#2f3f78']},
+k=sc=='pagi-berkabut'?'dawn':sc=='danau'?pick(['dawn','gold','day']):sc=='hutan'?'gold':pick(['day','day','dawn','gold']),P=PS[k],hz=hx(P[0][2]),forest=sc=='hutan';
+g.fillStyle=gr2(g,0,wy,[[0,P[0][0]],[.55,P[0][1]],[1,P[0][2]]]);g.fillRect(0,0,W,H);sunGlow(g,100+r()*340,200+r()*120,200,.8);
+const sn=forest?null:'#fff',cl=forest?'#7fa88a':P[2],cd=forest?'#3d6b52':P[3];
+for(let i=0;i<5;i++)mtn(g,r,r()*W,wy-70,200+r()*160,90+r()*100,mix2(hx(cl),hz,.55),mix2(hx(cd),hz,.55),sn&&'#fff',P[1]);
+const mm=[[.5,wy-30,430,330+r()*70],[.12,wy-20,320,250+r()*60],[.9,wy-20,340,270+r()*60]];mm.forEach(a=>mtn(g,r,W*a[0],a[1],a[2],a[3],cl,cd,sn,P[1]));
+g.fillStyle=gr2(g,0,0,[]);const fc=forest?'#2d5a44':'#3a5f86';hillF(g,wv(r,3,14,.012),wy-34,mix2(hx(fc),hz,.35));pineRow(g,r,wy-30,13,46,mix2(hx(P[4]),hz,.25));
+hillF(g,wv(r,3,10,.015),wy-8,mix2(hx(fc),hz,.15));pineRow(g,r,wy-4,11,52,mix2(hx(P[4]),hz,.1));
+lakeFx(g,r,wy,P[0][2],P[3]);
+const sh=(left)=>{const f=wv(r,3,26,.01),pts=[[left?0:540,wy-50]];for(let y=wy-50;y<=H;y+=20){const t=(y-wy+50)/(H-wy+50);pts.push([left?(60+190*Math.pow(1-t,1.6)*(1+.2*Math.sin(y*.02)))*(1-t*.35):540-(60+190*Math.pow(1-t,1.6))*(1-t*.35),y])}pts.push([left?0:540,H]);poly(g,pts,mix2(hx(P[4]),[30,80,60],.55));return pts};
+const L=sh(true),Rt=sh(false);for(let i=0;i<7;i++){const a=L[2+Math.floor(r()*(L.length-4))],b=Rt[2+Math.floor(r()*(Rt.length-4))];pine(g,a[0]-r()*20,a[1]+8,60+r()*50,mix2(hx(P[4]),[20,50,50],.4));pine(g,b[0]+r()*20,b[1]+8,60+r()*50,mix2(hx(P[4]),[20,50,50],.4))}
+for(let i=0;i<3;i++){pine(g,8+i*38+r()*14,H+10,210+r()*100,'#0f1d44');pine(g,532-i*38-r()*14,H+10,210+r()*100,'#0f1d44')}
+if(sc=='pagi-berkabut'){const q=g.createLinearGradient(0,wy-200,0,wy+30);q.addColorStop(0,'rgba(255,245,235,0)');q.addColorStop(.6,'rgba(255,245,235,.55)');q.addColorStop(1,'rgba(255,245,235,0)');g.fillStyle=q;g.fillRect(0,wy-200,W,230)}
+addCloud(3,60,300,'#ffffff',rg(hx(P[2])),1);R.kind='mtn'}
+function scSea(g,r,R,addCloud,pick){const W=540,H=960,hz=H*.56,P=pick([['#1f2b5e','#c4546a','#ffb066'],['#2c3e7a','#e8795a','#ffd27a'],['#3a2f6b','#d9658a','#ffbb7a']]),sx=120+r()*300;
+g.fillStyle=gr2(g,0,hz,[[0,P[0]],[.6,P[1]],[1,P[2]]]);g.fillRect(0,0,W,H);sunGlow(g,sx,hz-20,260,1);g.fillStyle='#fff3c8';g.beginPath();g.arc(sx,hz-30,52,0,6.3);g.fill();
+hillF(g,wv(r,2,8,.02),hz-2,mix2([40,40,80],hx(P[2]),.45));
+g.fillStyle=gr2(g,hz,H,[[0,P[2]],[.25,P[1]],[1,'#1b1f48']]);g.fillRect(0,hz,W,H-hz);
+for(let i=0;i<120;i++){const d=Math.pow(r(),1.4),y=hz+4+d*(H-hz-8);g.fillStyle='rgba(255,240,190,'+(.15+r()*.3)+')';g.fillRect(sx+(r()-.5)*(30+d*260),y,10+d*60*r(),1.5+d*3)}
+for(let i=0;i<60;i++){const y=hz+10+Math.pow(r(),1.3)*(H-hz-20);g.fillStyle='rgba(20,20,60,.25)';g.fillRect(r()*W,y,20+r()*80,1.5+(y-hz)/150)}
+for(let i=0;i<2;i++){const bx=60+r()*420,by=hz+40+r()*120,s=28+r()*20;poly(g,[[bx-s,by],[bx+s,by],[bx+s*.7,by+s*.3],[bx-s*.7,by+s*.3]],'#15162f');poly(g,[[bx,by-s*1.7],[bx,by-s*.1],[bx+s*.8,by-s*.1]],'#241b3d')}
+palm(g,40,H+10,420,'#12122a',.9);palm(g,500,H+10,360,'#12122a',-.9);palm(g,150,H+10,220,'#171736',.5);
+addCloud(3,60,260,'#ffd9b0','#d46a7a',0);R.kind='sea'}
+function mosqueBig(g,x,y,s,col,lit){g.fillStyle=col;g.fillRect(x-s*.7,y-s*.5,s*1.4,s*.5);g.beginPath();g.arc(x,y-s*.5,s*.45,Math.PI,0);g.fill();g.fillRect(x-s*.02,y-s*1.25,s*.04,s*.3);g.beginPath();g.arc(x,y-s*1.3,s*.06,0,6.3);g.fill();
+[-.95,.95].forEach(d=>{const cx=x+d*s;g.fillRect(cx-s*.07,y-s*1.5,s*.14,s*1.5);g.beginPath();g.moveTo(cx-s*.1,y-s*1.5);g.lineTo(cx,y-s*1.85);g.lineTo(cx+s*.1,y-s*1.5);g.fill();g.fillRect(cx-s*.11,y-s*1.2,s*.22,s*.05)});
+[-.4,0,.4].forEach(d=>{g.beginPath();g.arc(x+d*s,y-s*.5,s*.14,Math.PI,0);g.fill()});if(lit){g.fillStyle=lit;[-.5,-.25,0,.25,.5].forEach(d=>g.fillRect(x+d*s-s*.03,y-s*.3,s*.06,s*.14))}}
+function scNight(g,r,R,addCloud,pick){const W=540,H=960,hz=H*.66;g.fillStyle=gr2(g,0,hz,[[0,'#060a22'],[.6,'#1a2b62'],[1,'#3d5290']]);g.fillRect(0,0,W,H);
+for(let i=0;i<170;i++){g.fillStyle='rgba(255,255,255,'+(.25+r()*.7)+')';const s=.6+r()*1.8;g.fillRect(r()*W,Math.pow(r(),1.3)*hz,s,s)}
+const mx=90+r()*360,my=130+r()*120;g.fillStyle='#f5efd0';g.beginPath();g.arc(mx,my,46,0,6.3);g.fill();g.fillStyle='#142355';g.beginPath();g.arc(mx+20,my-8,42,0,6.3);g.fill();sunGlow(g,mx,my,160,.35);
+hillF(g,wv(r,3,22,.01),hz-20,'#16224f');mosqueBig(g,150+r()*240,hz+6,90+r()*40,'#0b1230','#ffd36a');hillF(g,wv(r,3,16,.014),hz+30,'#0d1637');hillF(g,wv(r,3,14,.018),hz+90,'#0a1230');
+for(let i=0;i<4;i++)palm(g,30+r()*480,hz+90+r()*120,170+r()*130,'#070d24',(r()-.5)*1.6);g.fillStyle=gr2(g,hz+120,H,[[0,'#0a1230'],[1,'#050a1c']]);g.fillRect(0,hz+120,W,H);addCloud(2,80,260,'#3a4a86','#232f66',0);R.kind='night'}
+function scDesert(g,r,R,addCloud,pick){const W=540,H=960,hz=H*.58;g.fillStyle=gr2(g,0,hz,[[0,'#2f5f9f'],[.6,'#f0a060'],[1,'#ffd890']]);g.fillRect(0,0,W,H);sunGlow(g,100+r()*340,hz-90,220,.95);
+mosqueBig(g,100+r()*340,hz+4,34,'rgba(120,80,70,.55)',null);
+for(let i=0;i<5;i++){const y=hz+i*70,f=wv(r,3,26+i*8,.008+i*.002),q=g.createLinearGradient(0,0,W,0);q.addColorStop(0,mix2([250,200,130],[255,225,170],i/5));q.addColorStop(1,mix2([205,130,80],[170,100,80],i/5));g.fillStyle=q;g.beginPath();g.moveTo(0,H);for(let x=0;x<=W;x+=5)g.lineTo(x,y-f(x));g.lineTo(W,H);g.fill();g.strokeStyle='rgba(255,240,200,.5)';g.lineWidth=2;g.beginPath();for(let x=0;x<=W;x+=5)x?g.lineTo(x,y-f(x)):g.moveTo(x,y-f(x));g.stroke()}
+for(let i=0;i<3;i++)palm(g,60+r()*420,hz+250+r()*160,160+r()*90,'#5a4a2a',(r()-.5)*1.4);addCloud(2,60,220,'#fff3dc','#f0b07a',0);R.kind='desert'}
+function buildScene(R){const c=document.createElement('canvas');c.width=540;c.height=960;const g=c.getContext('2d'),sc=R.x.scene,r=rngS('s'+R.x.id+sc);R.cs=[];R.kind='';
+const pick=a=>a[Math.floor(r()*a.length)],addCloud=(n,y0,y1,c1,c2,big)=>{for(let i=0;i<n;i++){const w=Math.round((big?230:160)+r()*120);R.cs.push({sp:cloudSp(r,w,Math.round(w*.5),c1,c2),y:y0+r()*(y1-y0),v:4+r()*8,o:r()*900,w})}};
+if(NEWSC[sc])NEWSC[sc](g,r,R,addCloud,pick);else if(sc.indexOf('kota-')==0)scCity(g,r,R,sc,addCloud,pick);else if(['gunung','danau','pagi-berkabut','hutan'].includes(sc))scMtn(g,r,R,sc,addCloud,pick);else if(sc=='pantai')scSea(g,r,R,addCloud,pick);else if(sc=='langit-malam')scNight(g,r,R,addCloud,pick);else if(sc=='padang-pasir')scDesert(g,r,R,addCloud,pick);else scPaddy(g,r,R,sc,addCloud,pick);return c}
+function sceneFrame(g,R,t){if(!R.bg)R.bg=buildScene(R);kbDraw(g,R,t);dynFx(g,R,t);
+R.cs.forEach(c=>{const w2=540+c.w*2;g.globalAlpha=R.kind=='rain'?.85:.95;g.drawImage(c.sp,((c.o+t*c.v)%w2)-c.w,c.y)});g.globalAlpha=1;
+if(R.kind=='mtn')bird(g,((t*38+120)%640)-50,150+Math.sin(t*.7)*18,26,t,'#14161c',true);
+if(R.kind=='paddy'||R.kind=='sea')for(let i=0;i<4;i++)bird(g,((t*(30+i*6)+i*170)%640)-50,110+i*38+Math.sin(t+i)*8,9+i,t+i,R.kind=='sea'?'#f6f1e6':'#27302a',false);
+if(R.kind=='rain'){g.strokeStyle='rgba(225,235,245,.4)';g.lineWidth=1.3;for(let k=0;k<140;k++){const x=(k*47.3)%540,y=((k*83.1)+t*(520+(k%5)*60))%960;g.beginPath();g.moveTo(x,y);g.lineTo(x-4,y+24);g.stroke()}}
+if(R.kind=='night'){for(let k=0;k<18;k++){const x=(k*89)%540+Math.sin(t*.6+k)*14,y=520+((k*53)%360)+Math.cos(t*.5+k*2)*10;g.globalAlpha=.35+.65*Math.abs(Math.sin(t*1.3+k));g.fillStyle='#ffe98a';g.beginPath();g.arc(x,y,2.2,0,6.3);g.fill()}g.globalAlpha=1}
+if(R.kind=='paddy'){g.strokeStyle='#4f9a35';g.lineWidth=3;g.lineCap='round';for(let i=0;i<48;i++){const x=(i*47)%540,y=905+((i*29)%45),w=Math.sin(t*1.6+i)*5;g.beginPath();g.moveTo(x,y+30);g.quadraticCurveTo(x+w*.4,y+8,x+w,y-18);g.stroke()}}}
+/* ===== akhir PERBAIKAN 7 ===== */
+/* ===== PERBAIKAN 8: 8 pilar konten, sumber terpercaya, desain beragam, adegan, durasi minimal 45 detik ===== */
+const MIN_V=45;
+const ADG=SCN.filter(s=>s!='umum');
+const LAY=['tengah-klasik','tengah-bingkai','tengah-judul-atas','tengah-emas','tengah-kartu'];
+const BADGE={'Al-Quran & tafsir':'AL-QURAN & TAFSIR','Hadis & sunnah':'HADIS & SUNNAH','Fikih & ibadah':'FIKIH & IBADAH','Doa & zikir':'DOA & ZIKIR','Motivasi & pengingat':'PENGINGAT','Sejarah & kisah Islam':'SEJARAH & KISAH','Akhlak & sosial':'AKHLAK & SOSIAL','Ilmu Islam & tanya jawab':'ILMU ISLAM'};
+const SUB={'Al-Quran & tafsir':['Ayat pilihan dan maknanya','Tafsir ayat','Asbabun nuzul','Pelajaran dari ayat Al-Quran','Tadabbur Al-Quran'],
+'Hadis & sunnah':['Hadis shahih dan penjelasan maknanya','Hadis hasan dan penjelasan maknanya','Sunnah harian Rasulullah','Akhlak dan kebiasaan Rasulullah','Kisah teladan Nabi Muhammad'],
+'Fikih & ibadah':['Tata cara salat','Wudu dan bersuci','Puasa','Zakat','Haji dan umrah','Halal dan haram','Fikih kehidupan sehari-hari'],
+'Doa & zikir':['Doa sehari-hari','Zikir pagi dan petang','Doa dari Al-Quran','Doa dari hadis','Doa ketika menghadapi kesulitan','Keutamaan zikir'],
+'Motivasi & pengingat':['Sabar dan ikhlas','Tawakal dan syukur','Taubat dan memperbaiki diri','Menghadapi ujian hidup','Mengingat kematian dan akhirat','Nasihat untuk kehidupan modern'],
+'Sejarah & kisah Islam':['Kisah para nabi','Kisah sahabat Rasulullah','Sejarah peradaban Islam','Kisah ulama terdahulu','Peristiwa penting dalam Islam'],
+'Akhlak & sosial':['Adab kepada orang tua','Adab bertetangga','Menjaga lisan','Kejujuran dan amanah','Pernikahan dan keluarga','Muamalah dan hubungan antarmanusia'],
+'Ilmu Islam & tanya jawab':['Pertanyaan umum seputar Islam','Meluruskan kesalahpahaman','Mengenal akidah dan tauhid','Asmaul Husna','Perbedaan pendapat ulama','Belajar Islam untuk pemula']};
+const MIGR={'Ayat':'Al-Quran & tafsir','Hadits':'Hadis & sunnah','Doa harian':'Doa & zikir','Asmaul Husna':'Ilmu Islam & tanya jawab','Kisah':'Sejarah & kisah Islam','Sejarah':'Sejarah & kisah Islam','Nasihat':'Motivasi & pengingat','Kata mutiara':'Motivasi & pengingat','Ceramah singkat':'Motivasi & pengingat'};
+const MSUB={'Ayat':'Ayat pilihan dan maknanya','Hadits':'Hadis shahih dan penjelasan maknanya','Doa harian':'Doa dari Al-Quran','Asmaul Husna':'Asmaul Husna','Sejarah':'Sejarah peradaban Islam'};
+function migr(x){if(MIGR[x.jenis]){if(!x.sub&&MSUB[x.jenis])x.sub=MSUB[x.jenis];x.jenis=MIGR[x.jenis]}return x}
+const pkR=a=>a[Math.floor(Math.random()*a.length)];
+function pilihSub(x){const u=S.items.filter(i=>i.jenis==x.jenis&&i.id!=x.id&&i.sub).slice(-6).map(i=>i.sub),l=SUB[x.jenis]||[''],f=l.filter(s=>!u.includes(s));return pkR(f.length?f:l)}
+function modeKonten(x){const j=x.jenis,s=x.sub||'';
+if(j=='Al-Quran & tafsir')return'quran';
+if(j=='Hadis & sunnah')return(!s||/^Hadis/.test(s))?'hadis':'narasi';
+if(j=='Doa & zikir')return/Al-Quran|kesulitan/i.test(s)?'doaq':/hadis|sehari|zikir pagi/i.test(s)?'doah':(s?'narasi':'doaq');
+if(j=='Ilmu Islam & tanya jawab'&&/asmaul/i.test(s+' '+(x.tema||'')))return'asma';
+return'narasi'}
+const POOL={'Al-Quran & tafsir':['sawah','danau','gunung','pagi-berkabut','hutan','geometri','aurora','pantai','kebun-kelapa','langit-malam','interior'],
+'Hadis & sunnah':['interior','geometri','pagi-berkabut','gunung','lentera','perkamen','hutan','padang-pasir'],
+'Fikih & ibadah':['interior','geometri','lentera','perkamen','pagi-berkabut','kota-utsmani'],
+'Doa & zikir':['lentera','langit-malam','geometri','interior','aurora','hujan','danau','pagi-berkabut'],
+'Motivasi & pengingat':['danau','sawah','gunung','pagi-berkabut','hujan','aurora','pantai','kebun-kelapa','langit-malam','hutan'],
+'Sejarah & kisah Islam':['karavan','kapal','perkamen','padang-pasir','kota-andalusia','kota-nusantara','kota-utsmani','kota-samarkand','kota-mughal','kota-timbuktu','kota-tiongkok','kota-persia'],
+'Akhlak & sosial':['sawah','kebun-kelapa','danau','pagi-berkabut','perkamen','interior','hujan'],
+'Ilmu Islam & tanya jawab':['perkamen','geometri','interior','lentera','aurora','langit-malam']};
+const WIL=['Nusantara (Indonesia, Malaysia, Brunei)','Andalusia (Spanyol dan Portugal)','Turki dan Kesultanan Utsmani','Asia Tengah (Samarkand, Bukhara, Khwarazm)','Anak benua India (Delhi, Mughal, Bengal)','Afrika Barat (Mali, Songhai, Timbuktu)','Afrika Timur (Swahili, Zanzibar, Kilwa)','Tiongkok (Muslim Tiongkok, Laksamana Zheng He)','Persia dan Iran','Mesir dan Afrika Utara (Maghrib)','Balkan dan Eropa Timur','Asia Tenggara daratan dan Filipina (Champa, Malaka, Sulu)','Syam dan Irak (Umayyah, Abbasiyah, Baghdad)','Hijaz dan awal Islam','Dunia Islam era modern (abad ke-19 sampai sekarang)','Sisilia dan Mediterania','Rusia, Kaukasus, dan bangsa Tatar'];
+const REG=[[/nusantara|indonesia|jawa|sumatra|aceh|malaysia|melayu|demak|brunei|filipina|champa|malaka|sulu/i,'kota-nusantara'],[/andalus|spanyol|cordoba|granada|spain|portugal|sisilia|mediterania/i,'kota-andalusia'],[/turki|utsmani|ottoman|istanbul|anatolia|seljuk|balkan|mesir|kairo|syam|irak|baghdad|damaskus|hijaz|makkah|mekah|madinah|abbasiyah|umayyah|modern/i,'kota-utsmani'],[/asia tengah|samarkand|bukhara|khwarazm|uzbek|timur lenk|tashkent|rusia|kaukasus|tatar/i,'kota-samarkand'],[/india|mughal|delhi|bengal|pakistan|hindustan/i,'kota-mughal'],[/afrika|mali|songhai|timbuktu|swahili|zanzibar|maroko|maghrib|kilwa/i,'kota-timbuktu'],[/tiongkok|cina|china|zheng/i,'kota-tiongkok'],[/persia|iran|safawi|isfahan|syiraz|shiraz/i,'kota-persia']];
+function regSc(s){s=String(s||'');for(const q of REG)if(q[0].test(s))return q[1];return''}
+function pilihWil(x){const u=S.items.filter(i=>i.id!=x.id&&i.wil).slice(-12).map(i=>i.wil),f=WIL.filter(w=>!u.includes(w));return pkR(f.length?f:WIL)}
+function pickScene(x){const pl=POOL[x.jenis]||ADG,u=S.items.filter(i=>i.date==x.date&&i.id!=x.id&&i.scene).map(i=>i.scene),f=pl.filter(s=>!u.includes(s));return pkR(f.length?f:pl)}
+function pickLay(x){const u=S.items.filter(i=>i.date==x.date&&i.id!=x.id&&i.tata).map(i=>i.tata),f=LAY.filter(z=>!u.includes(z));return pkR(f.length?f:LAY)}
+function pickDesign(x){x.scene=pickScene(x);x.tata=pickLay(x);x.ad=null;x.prompt='Vertical illustrated landscape, '+x.scene.replace(/-/g,' ')+', soft cinematic light, no people, no text'}
+function titleFor(x){return x.judul||'Pengingat hari ini'}
+const DOA=[
+{ref:'1:6',judul:'Doa Memohon Petunjuk Jalan yang Lurus',tag:'petunjuk hidayah jalan lurus'},
+{ref:'2:127',judul:'Doa Memohon Amal Diterima',tag:'amal ibadah diterima'},
+{ref:'2:201',judul:'Doa Kebaikan Dunia dan Akhirat',tag:'dunia akhirat kebaikan sapu jagat'},
+{ref:'3:8',judul:'Doa Memohon Hati Tetap dalam Petunjuk',tag:'hati petunjuk keteguhan iman'},
+{ref:'3:38',judul:'Doa Nabi Zakariya Memohon Keturunan Saleh',tag:'keturunan anak keluarga'},
+{ref:'3:147',judul:'Doa Memohon Ampunan dan Keteguhan',tag:'ampunan keteguhan kemenangan'},
+{ref:'3:193',judul:'Doa Memohon Ampunan Dosa dan Wafat dalam Kebaikan',tag:'ampunan wafat dosa'},
+{ref:'5:114',judul:'Doa Nabi Isa Memohon Rezeki',tag:'rezeki makanan'},
+{ref:'7:23',judul:'Doa Nabi Adam Memohon Ampunan',tag:'ampunan taubat'},
+{ref:'7:126',judul:'Doa Memohon Kesabaran',tag:'sabar ujian kesulitan'},
+{ref:'12:101',judul:'Doa Nabi Yusuf Memohon Husnul Khatimah',tag:'wafat husnul khatimah iman'},
+{ref:'14:40',judul:'Doa Memohon Diri dan Keturunan Menegakkan Shalat',tag:'shalat keluarga keturunan'},
+{ref:'14:41',judul:'Doa Memohon Ampunan untuk Orang Tua dan Kaum Mukmin',tag:'orang tua ampunan'},
+{ref:'17:24',judul:'Doa untuk Kedua Orang Tua',tag:'orang tua ayah ibu'},
+{ref:'18:10',judul:'Doa Memohon Rahmat dan Petunjuk',tag:'rahmat petunjuk ujian kesulitan'},
+{ref:'20:25',judul:'Doa Nabi Musa Memohon Kelapangan Dada',tag:'kelapangan dada lapang urusan kesulitan'},
+{ref:'20:114',judul:'Doa Memohon Tambahan Ilmu',tag:'ilmu belajar'},
+{ref:'21:83',judul:'Doa Nabi Ayyub saat Ditimpa Sakit',tag:'sakit kesembuhan ujian sabar kesulitan'},
+{ref:'21:87',judul:'Doa Nabi Yunus saat Dalam Kesulitan',tag:'kesulitan ujian sempit musibah'},
+{ref:'23:118',judul:'Doa Memohon Ampunan dan Rahmat',tag:'ampunan rahmat'},
+{ref:'25:74',judul:'Doa Memohon Keluarga Penyejuk Hati',tag:'keluarga pasangan anak keturunan'},
+{ref:'28:24',judul:'Doa Nabi Musa Memohon Kebaikan',tag:'rezeki kebaikan butuh kesulitan'},
+{ref:'59:10',judul:'Doa Memohon Ampunan untuk Saudara Seiman',tag:'ampunan saudara persaudaraan'}];
+const DOAH=[
+{judul:'Sayyidul Istighfar',ar:'اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ بِذَنْبِي فَاغْفِرْ لِي، فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ',id:'Ya Allah, Engkau Tuhanku, tidak ada Tuhan selain Engkau. Engkau menciptakanku dan aku hamba-Mu. Aku berada di atas perjanjian dan janji-Mu semampuku. Aku berlindung kepada-Mu dari keburukan perbuatanku. Aku mengakui nikmat-Mu atasku dan mengakui dosaku, maka ampunilah aku, sebab tidak ada yang mengampuni dosa selain Engkau.',rj:'HR. Bukhari no. 6306',dj:'shahih',tag:'ampunan pagi petang taubat'},
+{judul:'Doa Berlindung dari Kesedihan dan Beban Hidup',ar:'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ، وَالْعَجْزِ وَالْكَسَلِ، وَالْبُخْلِ وَالْجُبْنِ، وَضَلَعِ الدَّيْنِ وَغَلَبَةِ الرِّجَالِ',id:'Ya Allah, aku berlindung kepada-Mu dari kesusahan dan kesedihan, dari kelemahan dan kemalasan, dari kekikiran dan sifat pengecut, dari beban utang dan tekanan orang-orang.',rj:'HR. Bukhari no. 6369',dj:'shahih',tag:'kesulitan sedih utang beban sehari'},
+{judul:'Doa Sebelum Tidur',ar:'اللَّهُمَّ بِاسْمِكَ أَمُوتُ وَأَحْيَا',id:'Dengan nama-Mu ya Allah, aku mati dan aku hidup.',rj:'HR. Bukhari no. 6324',dj:'shahih',tag:'tidur malam sehari'},
+{judul:'Doa Bangun Tidur',ar:'الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ',id:'Segala puji bagi Allah yang menghidupkan kami setelah mematikan kami, dan kepada-Nya kami dikembalikan.',rj:'HR. Bukhari no. 6312',dj:'shahih',tag:'bangun pagi sehari'},
+{judul:'Zikir Penyerahan Diri kepada Allah',ar:'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ',id:'Tiada daya dan kekuatan kecuali dengan pertolongan Allah.',rj:'HR. Bukhari dan Muslim',dj:'shahih',tag:'zikir kesulitan sehari tawakal'},
+{judul:'Doa Ketika Mengalami Kesulitan',ar:'لَا إِلَهَ إِلَّا اللَّهُ الْعَظِيمُ الْحَلِيمُ، لَا إِلَهَ إِلَّا اللَّهُ رَبُّ الْعَرْشِ الْعَظِيمِ، لَا إِلَهَ إِلَّا اللَّهُ رَبُّ السَّمَاوَاتِ وَرَبُّ الْأَرْضِ وَرَبُّ الْعَرْشِ الْكَرِيمِ',id:'Tiada Tuhan selain Allah Yang Maha Agung lagi Maha Penyantun. Tiada Tuhan selain Allah, Tuhan Arasy yang agung. Tiada Tuhan selain Allah, Tuhan langit, Tuhan bumi, dan Tuhan Arasy yang mulia.',rj:'HR. Bukhari dan Muslim',dj:'shahih',tag:'kesulitan musibah sempit'},
+{judul:'Zikir Ringan di Lisan, Berat di Timbangan',ar:'سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ',id:'Maha Suci Allah dan dengan memuji-Nya, Maha Suci Allah Yang Maha Agung.',rj:'HR. Bukhari dan Muslim',dj:'shahih',tag:'zikir pagi petang keutamaan'}];
+const HB=[
+{ar:'إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ، وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى',id:'Sesungguhnya amal-amal itu tergantung pada niatnya, dan setiap orang hanya mendapatkan apa yang ia niatkan.',rj:'HR. Bukhari dan Muslim (Arbain Nawawi no. 1)',tag:'niat ikhlas amal'},
+{ar:'مَنْ كَانَ يُؤْمِنُ بِاللَّهِ وَالْيَوْمِ الْآخِرِ فَلْيَقُلْ خَيْرًا أَوْ لِيَصْمُتْ',id:'Barang siapa beriman kepada Allah dan hari akhir, hendaklah ia berkata baik atau diam.',rj:'HR. Bukhari dan Muslim (Arbain Nawawi no. 15)',tag:'lisan ucapan diam'},
+{ar:'لَا يُؤْمِنُ أَحَدُكُمْ حَتَّى يُحِبَّ لِأَخِيهِ مَا يُحِبُّ لِنَفْسِهِ',id:'Tidak sempurna iman salah seorang di antara kalian sampai ia mencintai untuk saudaranya apa yang ia cintai untuk dirinya sendiri.',rj:'HR. Bukhari dan Muslim (Arbain Nawawi no. 13)',tag:'saudara cinta persaudaraan'},
+{ar:'الْمُسْلِمُ مَنْ سَلِمَ الْمُسْلِمُونَ مِنْ لِسَانِهِ وَيَدِهِ',id:'Seorang muslim adalah orang yang kaum muslimin selamat dari lisan dan tangannya.',rj:'HR. Bukhari dan Muslim',tag:'lisan akhlak muslim'},
+{ar:'الدِّينُ النَّصِيحَةُ',id:'Agama itu adalah nasihat.',rj:'HR. Muslim (Arbain Nawawi no. 7)',tag:'nasihat agama'},
+{ar:'مَنْ سَلَكَ طَرِيقًا يَلْتَمِسُ فِيهِ عِلْمًا سَهَّلَ اللَّهُ لَهُ بِهِ طَرِيقًا إِلَى الْجَنَّةِ',id:'Barang siapa menempuh jalan untuk mencari ilmu, Allah mudahkan baginya jalan menuju surga.',rj:'HR. Muslim',tag:'ilmu belajar'},
+{ar:'مَنْ دَلَّ عَلَى خَيْرٍ فَلَهُ مِثْلُ أَجْرِ فَاعِلِهِ',id:'Barang siapa menunjukkan kepada kebaikan, maka ia mendapat pahala seperti pahala orang yang melakukannya.',rj:'HR. Muslim',tag:'kebaikan pahala dakwah'},
+{ar:'أَحَبُّ الْأَعْمَالِ إِلَى اللَّهِ أَدْوَمُهَا وَإِنْ قَلَّ',id:'Amal yang paling dicintai Allah adalah yang paling terus-menerus dikerjakan, walaupun sedikit.',rj:'HR. Bukhari dan Muslim',tag:'amal istiqomah konsisten'},
+{ar:'لَيْسَ الشَّدِيدُ بِالصُّرَعَةِ، إِنَّمَا الشَّدِيدُ الَّذِي يَمْلِكُ نَفْسَهُ عِنْدَ الْغَضَبِ',id:'Orang kuat bukanlah yang menang bergulat, tetapi orang kuat adalah yang mampu menahan dirinya ketika marah.',rj:'HR. Bukhari dan Muslim',tag:'marah sabar emosi akhlak'},
+{ar:'مَنْ لَا يَرْحَمْ لَا يُرْحَمْ',id:'Barang siapa tidak menyayangi, ia tidak akan disayangi.',rj:'HR. Bukhari dan Muslim',tag:'kasih sayang akhlak anak'},
+{ar:'لَا يَدْخُلُ الْجَنَّةَ مَنْ كَانَ فِي قَلْبِهِ مِثْقَالُ ذَرَّةٍ مِنْ كِبْرٍ',id:'Tidak akan masuk surga orang yang di dalam hatinya ada kesombongan seberat biji sawi.',rj:'HR. Muslim',tag:'sombong kibr hati akhlak'},
+{ar:'إِنَّ اللَّهَ لَا يَنْظُرُ إِلَى صُوَرِكُمْ وَأَمْوَالِكُمْ وَلَكِنْ يَنْظُرُ إِلَى قُلُوبِكُمْ وَأَعْمَالِكُمْ',id:'Sesungguhnya Allah tidak melihat rupa dan harta kalian, tetapi Dia melihat hati dan amal kalian.',rj:'HR. Muslim',tag:'hati ikhlas amal'},
+{ar:'إِذَا مَاتَ الْإِنْسَانُ انْقَطَعَ عَنْهُ عَمَلُهُ إِلَّا مِنْ ثَلَاثَةٍ: إِلَّا مِنْ صَدَقَةٍ جَارِيَةٍ، أَوْ عِلْمٍ يُنْتَفَعُ بِهِ، أَوْ وَلَدٍ صَالِحٍ يَدْعُو لَهُ',id:'Apabila manusia meninggal, terputuslah amalnya kecuali tiga hal: sedekah jariyah, ilmu yang bermanfaat, atau anak saleh yang mendoakannya.',rj:'HR. Muslim',tag:'kematian amal jariyah ilmu anak'},
+{ar:'مَنْ صَامَ رَمَضَانَ إِيمَانًا وَاحْتِسَابًا غُفِرَ لَهُ مَا تَقَدَّمَ مِنْ ذَنْبِهِ',id:'Barang siapa berpuasa Ramadan karena iman dan mengharap pahala, diampuni dosanya yang telah lalu.',rj:'HR. Bukhari dan Muslim',tag:'puasa ramadan ampunan'},
+{ar:'الْمُؤْمِنُ لِلْمُؤْمِنِ كَالْبُنْيَانِ يَشُدُّ بَعْضُهُ بَعْضًا',id:'Seorang mukmin bagi mukmin yang lain bagaikan bangunan, sebagian menguatkan sebagian yang lain.',rj:'HR. Bukhari dan Muslim',tag:'persaudaraan sosial'},
+{ar:'يَسِّرُوا وَلَا تُعَسِّرُوا، وَبَشِّرُوا وَلَا تُنَفِّرُوا',id:'Permudahlah dan jangan mempersulit, berilah kabar gembira dan jangan membuat orang lari.',rj:'HR. Bukhari dan Muslim',tag:'dakwah mudah akhlak'},
+{ar:'مَنْ غَشَّنَا فَلَيْسَ مِنَّا',id:'Barang siapa menipu kami, maka ia bukan golongan kami.',rj:'HR. Muslim',tag:'jujur dagang muamalah curang'},
+{ar:'الْحَيَاءُ لَا يَأْتِي إِلَّا بِخَيْرٍ',id:'Rasa malu tidak mendatangkan kecuali kebaikan.',rj:'HR. Bukhari dan Muslim',tag:'malu akhlak'},
+{ar:'خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ',id:'Sebaik-baik kalian adalah orang yang belajar Al-Quran dan mengajarkannya.',rj:'HR. Bukhari',tag:'quran belajar ilmu'},
+{ar:'إِنَّ مِنْ خِيَارِكُمْ أَحْسَنَكُمْ أَخْلَاقًا',id:'Sesungguhnya di antara orang terbaik kalian adalah yang paling baik akhlaknya.',rj:'HR. Bukhari dan Muslim',tag:'akhlak'},
+{ar:'كُلُّ مَعْرُوفٍ صَدَقَةٌ',id:'Setiap kebaikan adalah sedekah.',rj:'HR. Bukhari dan Muslim',tag:'sedekah kebaikan'},
+{ar:'الْيَدُ الْعُلْيَا خَيْرٌ مِنَ الْيَدِ السُّفْلَى',id:'Tangan di atas (memberi) lebih baik daripada tangan di bawah (meminta).',rj:'HR. Bukhari dan Muslim',tag:'sedekah rezeki mandiri'},
+{ar:'أَوَلَا أَدُلُّكُمْ عَلَى شَيْءٍ إِذَا فَعَلْتُمُوهُ تَحَابَبْتُمْ؟ أَفْشُوا السَّلَامَ بَيْنَكُمْ',id:'Maukah kalian kutunjukkan sesuatu yang jika kalian lakukan kalian akan saling mencintai? Sebarkanlah salam di antara kalian.',rj:'HR. Muslim',tag:'salam persaudaraan sosial'},
+{ar:'عَجَبًا لِأَمْرِ الْمُؤْمِنِ إِنَّ أَمْرَهُ كُلَّهُ خَيْرٌ، وَلَيْسَ ذَاكَ لِأَحَدٍ إِلَّا لِلْمُؤْمِنِ: إِنْ أَصَابَتْهُ سَرَّاءُ شَكَرَ فَكَانَ خَيْرًا لَهُ، وَإِنْ أَصَابَتْهُ ضَرَّاءُ صَبَرَ فَكَانَ خَيْرًا لَهُ',id:'Menakjubkan urusan orang mukmin, semua urusannya baik baginya. Jika mendapat kesenangan ia bersyukur, itu baik baginya. Jika tertimpa kesulitan ia bersabar, itu pun baik baginya.',rj:'HR. Muslim',tag:'sabar syukur ujian'},
+{ar:'نِعْمَتَانِ مَغْبُونٌ فِيهِمَا كَثِيرٌ مِنَ النَّاسِ: الصِّحَّةُ وَالْفَرَاغُ',id:'Dua nikmat yang sering membuat banyak orang tertipu: kesehatan dan waktu luang.',rj:'HR. Bukhari',tag:'waktu sehat syukur'},
+{ar:'كُنْ فِي الدُّنْيَا كَأَنَّكَ غَرِيبٌ أَوْ عَابِرُ سَبِيلٍ',id:'Jadilah engkau di dunia seakan-akan orang asing atau seorang musafir.',rj:'HR. Bukhari',tag:'dunia akhirat kematian zuhud'},
+{ar:'الْمَرْءُ مَعَ مَنْ أَحَبَّ',id:'Seseorang akan bersama orang yang ia cintai.',rj:'HR. Bukhari dan Muslim',tag:'cinta sahabat teman'},
+{ar:'مَنْ سَتَرَ مُسْلِمًا سَتَرَهُ اللَّهُ يَوْمَ الْقِيَامَةِ',id:'Barang siapa menutupi aib seorang muslim, Allah akan menutupi aibnya pada hari kiamat.',rj:'HR. Bukhari dan Muslim',tag:'aib lisan sosial'},
+{ar:'إِنَّ الصِّدْقَ يَهْدِي إِلَى الْبِرِّ، وَإِنَّ الْبِرَّ يَهْدِي إِلَى الْجَنَّةِ',id:'Sesungguhnya kejujuran menunjukkan kepada kebaikan, dan kebaikan menunjukkan ke surga.',rj:'HR. Bukhari dan Muslim',tag:'jujur amanah'},
+{ar:'آيَةُ الْمُنَافِقِ ثَلَاثٌ: إِذَا حَدَّثَ كَذَبَ، وَإِذَا وَعَدَ أَخْلَفَ، وَإِذَا اؤْتُمِنَ خَانَ',id:'Tanda orang munafik ada tiga: jika berbicara ia berdusta, jika berjanji ia mengingkari, dan jika dipercaya ia berkhianat.',rj:'HR. Bukhari dan Muslim',tag:'jujur amanah janji munafik'},
+{ar:'إِنَّ الرِّفْقَ لَا يَكُونُ فِي شَيْءٍ إِلَّا زَانَهُ، وَلَا يُنْزَعُ مِنْ شَيْءٍ إِلَّا شَانَهُ',id:'Sesungguhnya kelembutan tidak ada pada sesuatu kecuali memperindahnya, dan tidak dicabut dari sesuatu kecuali memburukkannya.',rj:'HR. Muslim',tag:'lembut akhlak keluarga'},
+{ar:'مَنْ قَالَ سُبْحَانَ اللَّهِ وَبِحَمْدِهِ فِي يَوْمٍ مِائَةَ مَرَّةٍ حُطَّتْ خَطَايَاهُ وَإِنْ كَانَتْ مِثْلَ زَبَدِ الْبَحْرِ',id:'Barang siapa mengucapkan Subhanallahi wa bihamdihi seratus kali dalam sehari, dosa-dosanya digugurkan walaupun sebanyak buih di lautan.',rj:'HR. Bukhari dan Muslim',tag:'zikir tasbih ampunan'}];
+function hbk(){try{return JSON.parse(localStorage.getItem('ngelingan_hbank')||'[]')}catch(e){return[]}}
+function hbkAdd(h){try{const a=hbk();if(a.some(z=>z.ar==h.ar))return false;a.push(h);if(a.length>600)a.shift();localStorage.setItem('ngelingan_hbank',JSON.stringify(a));return true}catch(e){return false}}
+function usedArab(x){const s=new Set();S.items.forEach(i=>{if(i.id==x.id)return;(i.pg||[]).forEach(p=>s.add(p.arab));if(i.arab)s.add(i.arab)});return s}
+function pilihHB(x,used,n){const t=(x.tema||x.judul||x.sub||'').toLowerCase(),c=HB.concat(hbk()).filter(h=>!used.has(h.ar)),tg=c.filter(h=>String(h.tag||'').split(' ').some(z=>z.length>3&&t.includes(z))),cp=(tg.length?tg:c).slice(),o=[];while(o.length<(n||1)&&cp.length)o.push(cp.splice(Math.floor(Math.random()*cp.length),1)[0]);return o}
+async function tmo(u,ms){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms||12000);try{const r=await fetch(u,{signal:c.signal});if(!r.ok)throw new Error('HTTP '+r.status);return r}catch(e){throw e.name=='AbortError'?new Error('waktu habis'):e}finally{clearTimeout(t)}}
+const SURAH={};
+async function getSurah(n){if(SURAH[n])return SURAH[n];let j,tf=true,e1='',e2='';
+try{j=await(await tmo('https://api.alquran.cloud/v1/surah/'+n+'/editions/quran-uthmani,id.indonesian,id.jalalayn',25000)).json();if(!j.data||j.data.length<3)throw new Error('edisi tafsir tidak ada')}catch(a){e1=a.message;tf=false;try{j=await(await tmo('https://api.alquran.cloud/v1/surah/'+n+'/editions/quran-uthmani,id.indonesian',25000)).json();if(!j.data||j.data.length<2)throw new Error('data kosong')}catch(b){e2=b.message;
+try{const q=await(await tmo('https://api.quran.com/api/v4/verses/by_chapter/'+n+'?language=id&words=false&translations=33&fields=text_uthmani&per_page=300',25000)).json();return SURAH[n]={nm:'surat ke-'+n,ay:q.verses.map(v=>({n:v.verse_number,arab:v.text_uthmani,id:String(v.translations[0].text).replace(/<[^>]+>/g,''),tf:'',glob:0})),tf:false,src:'quran.com'}}catch(c){throw new Error('Al-Quran gagal diambil ('+e1+'; '+e2+'; '+c.message+')')}}}
+const d=j.data,ay=d[0].ayahs.map((a,i)=>{let ar=a.text;if(a.numberInSurah==1&&n!=1&&n!=9&&/^بِسْمِ/.test(ar))ar=ar.split(' ').slice(4).join(' ');return{n:a.numberInSurah,arab:ar,id:d[1].ayahs[i].text,tf:tf&&d[2]?d[2].ayahs[i].text:'',glob:a.number}});
+return SURAH[n]={nm:d[0].englishName,ay,tf,src:'alquran.cloud'}}
+const p3=n=>String(n).padStart(3,'0');
+function qariUrls(ref,glob){const q=ref.split(':'),id=p3(q[0])+p3(q[1]);return['https://verses.quran.com/Alafasy/mp3/'+id+'.mp3','https://everyayah.com/data/Alafasy_128kbps/'+id+'.mp3'].concat(glob?['https://cdn.islamic.network/quran/audio/128/ar.alafasy/'+glob+'.mp3']:[])}
+async function fetchAu(L){let e0=new Error('tidak ada sumber');for(const u of L){if(!u||u.indexOf('http')!=0)continue;try{const r=await fetch(u);if(r.ok)return r;e0=new Error('HTTP '+r.status)}catch(e){e0=new Error(e.message)}}throw e0}
+const HMIR=[e=>'https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/'+e,e=>'https://fastly.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/'+e,e=>'https://gcore.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/'+e,e=>'https://raw.githubusercontent.com/fawazahmed0/hadith-api/1/editions/'+e,e=>'https://cdn.statically.io/gh/fawazahmed0/hadith-api/1/editions/'+e];
+let HERR={};
+async function hOne(ed,n){let last='';for(const m of HMIR){const u=m(ed)+'/'+n+'.json',h=new URL(u).host;try{const r=await tmo(u,9000),d=await r.json(),q=d.hadiths?d.hadiths[0]:d,tx=String((q&&q.text)||'').replace(/\s+/g,' ').trim();if(tx)return{tx,host:h};last='kosong'}catch(e){last=e.message;HERR[h]=e.message}}throw new Error(last||'gagal')}
+async function getHadith(k,n){
+try{const r=await Promise.all([hOne('ara-'+k,n),hOne('ind-'+k,n)]);return{arab:r[0].tx,id:r[1].tx,number:n,src:r[0].host}}catch(e0){}
+try{const c=(await(await tmo('https://api.hadith.gading.dev/books/'+k+'/'+n)).json()).data.contents;if(c&&c.arab&&c.id)return{arab:String(c.arab),id:String(c.id),number:c.number||n,src:'api.hadith.gading.dev'}}catch(e){HERR['api.hadith.gading.dev']=e.message}
+return null}
+async function wikiFind(q,langs){let er='';
+for(const L of(langs||['id','en'])){try{const b='https://'+L+'.wikipedia.org/w/api.php?format=json&origin=*&',s=await(await tmo(b+'action=query&list=search&srlimit=3&srsearch='+encodeURIComponent(q),15000)).json(),hit=((s.query||{}).search||[])[0];if(!hit)continue;
+const d=await(await tmo(b+'action=query&prop=extracts&explaintext=1&exsectionformat=plain&redirects=1&titles='+encodeURIComponent(hit.title),20000)).json(),pg=Object.values(d.query.pages)[0];let tx=String(pg.extract||'').replace(/\n{3,}/g,'\n\n').trim();
+tx=tx.split(/\n(?:Referensi|Catatan kaki|Pranala luar|Daftar pustaka|Bacaan lanjutan|Lihat pula|References|External links|Notes|Further reading|See also|Bibliography|Sources)\n/)[0];
+if(tx.length<400)continue;return{lang:L,title:pg.title,url:'https://'+L+'.wikipedia.org/wiki/'+encodeURIComponent(pg.title.replace(/ /g,'_')),text:tx.slice(0,7000)}}catch(e){er=e.message}}
+throw new Error('Wikipedia: '+(er||'artikel tidak ditemukan'))}
+async function aiGround(q){const d=await gemAuto('t',{contents:[{parts:[{text:q}]}],tools:[{google_search:{}}],generationConfig:{temperature:.3}}),c=d.candidates[0],t=(c.content.parts||[]).map(z=>z.text||'').join(''),ch=((c.groundingMetadata||{}).groundingChunks||[]).map(z=>z.web).filter(Boolean),m=t.replace(/```json|```/g,'').match(/[\[{][\s\S]*[\]}]/);let j=null;try{j=JSON.parse(m[0])}catch(e){}return{j,src:ch}}
+const host=u=>{try{return new URL(u).host.replace(/^www\./,'')}catch(e){return String(u).slice(0,40)}};
+function setSrc(x,nama,urls){x.sumber=nama;x.sumberUrl=urls.map(u=>u.uri||u);x.sumberLink=[...new Set(urls.map(u=>u.title||host(u.uri||u)))].slice(0,4)}
+const JINFO={'Fikih & ibadah':'penjelasan fikih dan tuntunan ibadah yang berdalil, menyebut pendapat ulama atau mazhab bila berbeda','Motivasi & pengingat':'pengingat islami yang menyentuh dan praktis untuk kehidupan modern, berdalil dan bersumber dari ulama','Sejarah & kisah Islam':'kisah atau episode sejarah Islam yang dituturkan runtut seperti pencerita tenang (latar tempat dan zaman, peristiwa, tokoh, hikmah)','Akhlak & sosial':'pembahasan akhlak dan adab bermasyarakat yang berdalil dan praktis','Ilmu Islam & tanya jawab':'penjelasan ilmu Islam dalam bentuk tanya jawab: mulai dari satu pertanyaan umum, lalu jawabannya berdalil dan menyebut perbedaan pendapat yang diakui bila ada','Hadis & sunnah':'penjelasan sunnah atau akhlak Rasulullah berdasarkan hadis dengan rujukan kitab, nomor bila ada, dan derajatnya','Doa & zikir':'penjelasan keutamaan zikir berdasarkan dalil dan rujukannya','Al-Quran & tafsir':'penjelasan ayat berdasarkan tafsir ulama'};
+const ATURAN=' ATURAN WAJIB: (1) Semua fakta, nama, tempat, tahun, angka, dalil, dan kutipan HARUS berasal dari bahan sumber; jangan menambah dari ingatanmu, jangan mengarang atau mengubah redaksi ayat atau hadis, jangan mengarang keutamaan amalan. Bila bahan tidak memuat sesuatu, jangan menyebutnya. (2) Bedakan dengan jelas: dalil (ayat atau hadis), penjelasan atau tafsir ulama (sebut nama ulama atau kitabnya), dan pendapat; jangan memasukkan opini pribadi. (3) Bila ada perbedaan pendapat ulama yang diakui, sebutkan semuanya dengan adil beserta nama mazhab atau ulamanya, jangan menyatakan satu pendapat sebagai satu-satunya. Untuk fikih yang rumit sarankan bertanya kepada ustaz atau ahli ilmu. Bila menyebut fatwa, sebut lembaga atau ulama penerbitnya. (4) Tanpa vonis halal haram yang tidak ada di bahan, tanpa politik praktis, tanpa mengkafirkan atau menyesatkan siapa pun. (5) Jangan menggambarkan wajah nabi atau sahabat. (6) Naskah dibacakan dan tampil di layar: Bahasa Indonesia, kalimat pendek dan hidup, tanpa tanda kurung, tanpa daftar, tanpa singkatan.';
+function tulisPrompt(x,len,blok,extra){return 'Kamu penulis naskah video pendek dakwah Islam yang tenang, santun, dan sangat berhati-hati untuk channel "Ngelingan", bagi semua golongan umat Islam. Pilar: '+x.jenis+' (sub: '+(x.sub||'-')+'), yaitu '+(JINFO[x.jenis]||'penjelasan Islami')+'. '+extra+blok+ATURAN+
+' STRUKTUR NARASI ('+len+' kata) berurutan: pembuka singkat yang menarik; pembahasan; dalil beserta rujukannya (nama surat dan nomor ayat, atau kitab hadis dan nomor bila ada di bahan); penjelasan ulama dengan menyebut nama ulama atau kitabnya; kesimpulan berupa pelajaran yang bisa diamalkan; ditutup satu kalimat ajakan mengamalkan atau membagikan. Tulis JSON: "judul" (menarik tetapi tidak menyesatkan, maksimal 9 kata); "ket" keterangan singkat di layar (maksimal 7 kata, contoh: "Fikih salat · menurut empat mazhab", "Sejarah Islam · Andalusia", "Kisah sahabat · nama tokoh"); "narasi"; "caption" singkat; tepat 5 "hashtag"; "adegan" 4 sampai 5 elemen berurutan mengikuti alur narasi, tiap elemen {"scene": salah satu dari: '+ADG.join(', ')+', "chip": label pendek tempat atau waktu atau rujukan dari bahan, maksimal 5 kata, boleh kosong}; "tata" salah satu dari: '+LAY.join(', ')+'; "prompt_gambar" bahasa Inggris, satu scene tanpa manusia dan tanpa wajah. Bila bahan tidak cocok atau terlalu sedikit, balas {"tidak_relevan":true}. Balas hanya JSON: {"judul":"","ket":"","narasi":"","caption":"","hashtag":["","","","",""],"adegan":[{"scene":"","chip":""}],"tata":"","prompt_gambar":""}'}
+function penjPrompt(x,blok,len,extra){return 'Kamu penulis naskah video pendek dakwah Islam yang tenang dan sangat berhati-hati untuk channel "Ngelingan". Tugas: tulis bagian PENJELASAN yang dibacakan setelah dalil ditampilkan. '+extra+blok+ATURAN+' Narasi '+len+' kata berurutan: penjelasan atau tafsir (sebut nama ulama atau kitabnya), pelajaran yang bisa diamalkan, lalu satu kalimat ajakan mengamalkan atau membagikan. Tulis JSON: "judul" (menarik tetapi tidak menyesatkan, maksimal 9 kata), "narasi", "caption" singkat, tepat 5 "hashtag". Bila bahan tidak cukup, balas {"tidak_relevan":true}. Balas hanya JSON: {"judul":"","narasi":"","caption":"","hashtag":["","","","",""]}'}
+async function agenFakta(x,tugas,rc){const g=await aiGround('Kamu peneliti rujukan keislaman yang teliti. TUGAS: '+tugas+' Gunakan pencarian web dan utamakan sumber tepercaya: kitab klasik atau syarah yang dikutip situs ulama, NU Online, Muhammadiyah, Kemenag, Rumaysho, Islamweb, IslamQA, universitas Islam, ensiklopedia. Kumpulkan 6 sampai 10 poin penting. Setiap poin berisi "isi" (ringkas, jangan menyalin paragraf panjang) dan "sumber" (nama kitab, ulama, atau lembaga, dan judul halamannya). Bila ada perbedaan pendapat ulama, tulis tiap pendapat dengan nama ulama atau mazhabnya. Bila menyebut hadis, tulis kitab, nomor bila ada, dan derajatnya. Jangan mengarang. '+(rc?'Hindari topik yang mirip: '+rc+'. ':'')+'Balas hanya JSON: {"topik":"","poin":[{"isi":"","sumber":""}]}');
+if(!g.j||!Array.isArray(g.j.poin)||g.j.poin.length<3)throw new Error('pencarian tidak menemukan cukup bahan');if(!g.src.length)throw new Error('pencarian tidak mengembalikan tautan sumber');
+const teks=(g.j.topik?'TOPIK: '+g.j.topik+'\n':'')+g.j.poin.map((p,i)=>(i+1)+'. '+p.isi+' [Sumber: '+p.sumber+']').join('\n'),nm=[...new Set(g.j.poin.map(p=>String(p.sumber||'').split(/[,(]/)[0].trim()).filter(Boolean))].slice(0,3).join('; ');
+return{teks:'FAKTA TERKUMPUL (hasil pencarian web; satu-satunya bahan):\n'+teks+'\n',nama:nm||'Hasil pencarian web',urls:g.src.slice(0,4),ver:'web'}}
+function webTask(x,tema){const j=x.jenis,s=x.sub||'',T=tema?' Fokus: '+tema+'.':' Pilih sendiri satu topik spesifik di sub-tema ini.';
+if(j=='Fikih & ibadah')return'Kumpulkan penjelasan fikih tentang "'+s+'".'+T+' Sertakan dalil (ayat dan hadis dengan rujukan), pendapat ulama atau mazhab yang berbeda bila ada, serta rujukan kitab atau lembaga fatwa beserta konteksnya.';
+if(j=='Motivasi & pengingat')return'Kumpulkan nasihat ulama dan dalil (ayat atau hadis dengan rujukan) tentang "'+s+'" yang relevan untuk kehidupan modern.'+T+' Sebut nama ulama dan kitabnya.';
+if(j=='Akhlak & sosial')return'Kumpulkan dalil (ayat atau hadis dengan rujukan) dan penjelasan ulama tentang "'+s+'".'+T+' Sertakan contoh penerapan dari kitab adab atau akhlak.';
+if(j=='Ilmu Islam & tanya jawab')return'Kumpulkan jawaban berdalil untuk topik "'+s+'" dalam bentuk satu pertanyaan umum dan jawabannya.'+T+' Sertakan penjelasan ulama dan perbedaan pendapat yang diakui bila ada.';
+if(j=='Hadis & sunnah')return'Kumpulkan rujukan tentang "'+s+'" dari hadis (kitab, nomor bila ada, derajat) beserta penjelasan ulama atau syarahnya.'+T;
+if(j=='Doa & zikir')return'Kumpulkan keutamaan zikir dengan dalil hadis atau ayat (kitab, nomor, derajat) dan penjelasan ulama.'+T;
+return'Kumpulkan fakta tepercaya tentang "'+s+'".'+T}
+function finalPages(x,hash){x.caption=(x.judul||'')+'\n'+(x.rujukan||'')+'\n\n'+(x.pg||[]).slice(0,2).map(p=>'\u201c'+p.id+'\u201d').join('\n')+'\n\nSumber: '+x.sumber+(x.sumberLink&&x.sumberLink.length?' ('+x.sumberLink.join(', ')+')':'');x.hashtag=x.hashtag&&x.capExtra?x.hashtag:hash;pickDesign(x)}
+async function judulDari(x,teks,pre){try{const r=await ai('Buat satu judul singkat (maksimal 9 kata, '+pre+') dalam Bahasa Indonesia yang menarik tetapi tidak menyesatkan, sesuai isi berikut. Jangan menambah atau mengubah isinya. Isi: '+teks.slice(0,600)+' Balas hanya JSON: {"judul":""}');return r.judul||''}catch(e){return''}}
+async function tulisPenjelasan(x,blok,len,extra){try{const r=await ai(penjPrompt(x,blok,len,extra));if(r.tidak_relevan||!r.narasi||String(r.narasi).split(/\s+/).length<45)throw new Error('bahan kurang');x.narasi=String(r.narasi).trim();if(r.judul)x.judul=r.judul;x.capExtra=r.caption||'';if(Array.isArray(r.hashtag)&&r.hashtag.length)x.hashtag=r.hashtag.slice(0,5).map(z=>z[0]=='#'?z:'#'+z).join(' ');return true}catch(e){lg('   Penjelasan gagal ('+String(e.message).slice(0,100)+').');return false}}
+async function modeQuran(x){const used=S.items.filter(i=>i.id!=x.id&&i.ref).slice(-40).map(i=>i.ref),man=(x.arab&&x.terjemah)?{arab:x.arab,id:x.terjemah}:null;let ref=String(x.ref||'').trim();
+if(!/^\d+:\d+(-\d+)?$/.test(ref)){lg('   AI memilih ayat sesuai sub-tema...');const r0=await ai('Pilih ayat atau rentang ayat Al-Quran untuk konten "'+x.sub+'"'+(x.tema?' bertema "'+x.tema+'"':'')+'. Pilih satu kesatuan makna yang runtut: 3 sampai 6 ayat berurutan bila ayatnya pendek (1 sampai 2 ayat bila ayatnya panjang). Hindari yang sudah dipakai: '+(used.join(', ')||'-')+'. Isi ref format surat:ayatawal-ayatakhir, contoh 94:5-8, atau surat:ayat bila satu ayat. Jangan mengarang. Balas hanya JSON: {"ref":""}');ref=String(r0.ref||'').trim()}
+const mm=ref.match(/^(\d+):(\d+)(?:-(\d+))?$/);if(!mm)throw new Error('Kode ayat tidak valid: '+ref);const sn=+mm[1];let a1=+mm[2],a2=mm[3]?+mm[3]:a1,d;
+try{d=await getSurah(sn)}catch(e){if(man){lg('   '+e.message+' Memakai teks manual.');x.pg=[{arab:man.arab,id:man.id,lb:'',au:[]}];x.rujukan=x.ref||'Al-Quran';x.ket=x.rujukan;x.ver='bank';setSrc(x,'Teks yang ditempel pengguna',[]);x.judul=x.judul||'Pengingat dari Al-Quran';finalPages(x,'#AlQuran #Tafsir #Islami #Dakwah #Ngelingan');return}throw e}
+if(a1>d.ay.length)a1=1;if(a2<a1)a2=a1;const est=a=>a.arab.length*.07+a.id.split(' ').length/2.2+2,sel=[];
+for(let n=a1;n<=Math.min(d.ay.length,a1+9);n++){const a=d.ay[n-1];sel.push(a);const e=sel.reduce((p,c)=>p+est(c),0);if(n>=a2&&e>=28)break;if(e>=50)break}
+const last=sel[sel.length-1];x.ref=sn+':'+sel[0].n+(sel.length>1?'-'+last.n:'');
+x.pg=sel.map(a=>({arab:a.arab,id:a.id,lb:'QS. '+d.nm+' ayat '+a.n,au:qariUrls(sn+':'+a.n,a.glob)}));
+x.rujukan='QS. '+d.nm+' ('+sn+'): '+(sel.length>1?sel[0].n+'-'+last.n:sel[0].n);x.ket=x.rujukan;x.ver='teks';
+const tf=sel.map(a=>a.tf).filter(Boolean).join(' ').slice(0,3500),tafLabel='Tafsir Jalalayn (Jalaluddin al-Mahalli dan Jalaluddin as-Suyuthi)';
+lg('   '+sel.length+' ayat diambil ('+d.src+'): '+x.rujukan+(tf?', dengan tafsir.':', tanpa tafsir otomatis.'));
+let ok=false,nm=x.rujukan+' · terjemah Indonesia · '+d.src,urls=[{uri:'https://alquran.cloud',title:d.src}];
+const ayT='AYAT (terjemah): '+sel.map(a=>a.n+'. '+a.id).join(' ')+'\n';
+if(x.sub=='Asbabun nuzul'){try{const f=await agenFakta(x,'Cari asbabun nuzul (sebab turunnya) '+x.rujukan+' dari kitab seperti Asbabun Nuzul Al-Wahidi atau Lubabun Nuqul As-Suyuthi, beserta tafsirnya. Bila ayat ini tidak punya sebab turun khusus yang sahih, katakan demikian dan jelaskan konteks ayatnya.');ok=await tulisPenjelasan(x,ayT+f.teks,'80 sampai 110','Sub-tema: asbabun nuzul. ');if(ok){nm=x.rujukan+' · '+f.nama;urls=urls.concat(f.urls)}}catch(e){lg('   Asbabun nuzul gagal ('+String(e.message).slice(0,100)+').')}}
+if(!ok&&tf){ok=await tulisPenjelasan(x,ayT+'TAFSIR ('+tafLabel+'):\n"""'+tf+'"""\n','75 sampai 100','Sub-tema: '+x.sub+'. Sumber penjelasan: '+tafLabel+'. ');if(ok)nm=x.rujukan+' · '+tafLabel+' · '+d.src}
+if(!ok){try{const f=await agenFakta(x,'Cari tafsir '+x.rujukan+' menurut ulama tepercaya (misalnya Ibnu Katsir, Tafsir Kemenag, Quraish Shihab, As-Sa\u2019di) dan pelajaran darinya.');ok=await tulisPenjelasan(x,ayT+f.teks,'75 sampai 100','Sub-tema: '+x.sub+'. ');if(ok){nm=x.rujukan+' · '+f.nama;urls=urls.concat(f.urls)}}catch(e){lg('   Tafsir dari web gagal ('+String(e.message).slice(0,100)+').')}}
+if(!ok)lg('   Tidak ada penjelasan tafsir. Video hanya ayat dan terjemah.');
+setSrc(x,nm,urls);if(!ok)x.judul=await judulDari(x,sel.map(a=>a.id).join(' '),'bukan ajakan umum')||'Renungan dari '+x.rujukan;
+finalPages(x,'#AlQuran #Tafsir #Islami #Dakwah #Ngelingan');if(x.capExtra)x.caption=x.judul+'\n'+x.rujukan+'\n\n'+x.capExtra+'\n\nSumber: '+x.sumber}
+async function webHadis(x,used,hasan){const g=await aiGround('Cari di web SATU hadis '+(hasan?'berderajat hasan (sebut kitab seperti Tirmidzi, Abu Dawud, Ibnu Majah, atau Nasai)':'shahih dari Shahih Bukhari atau Shahih Muslim')+(x.tema?' bertema "'+x.tema+'"':' bertema '+x.sub)+'. Salin teks Arab berharakat PERSIS dari sumber (jangan mengubah redaksi), terjemah Indonesia, perawi atau kitab, nomor hadis bila tertulis, dan derajatnya. Pilih yang pendek (teks Arab di bawah 350 huruf). Hindari yang sudah dipakai: '+[...used].slice(-8).map(z=>z.slice(0,25)).join(' | ')+'. Balas hanya JSON: {"arab":"","terjemah":"","perawi":"","nomor":"","derajat":""}');
+const j=g.j;if(!j||!j.arab||!j.terjemah||j.arab.length<10||j.arab.length>420)throw new Error('pencarian hadis tidak menghasilkan teks yang sah');if(!g.src.length)throw new Error('tidak ada tautan sumber hadis');if(used.has(j.arab))throw new Error('hadis sudah pernah dipakai');
+return{arab:j.arab,id:j.terjemah,rj:'HR. '+String(j.perawi||'').replace(/^HR\.?\s*/i,'')+(j.nomor?' no. '+j.nomor:''),dj:String(j.derajat||'').toLowerCase(),urls:g.src.slice(0,3)}}
+async function modeHadis(x){const used=usedArab(x),hasan=/hasan/i.test(x.sub||''),man=(x.arab&&x.terjemah)?{arab:x.arab,id:x.terjemah}:null;let h=null,eS='',how='';
+if(!hasan){let ref=String(x.ref||'');if(!/^(bukhari|muslim):\d+$/.test(ref)){const r0=await ai('Pilih satu sumber hadis untuk konten "'+x.sub+'" bertema "'+(x.tema||x.judul||'bebas')+'". Hanya dari Shahih Bukhari atau Shahih Muslim, isi ref kitab:nomor, contoh bukhari:1. Pilih yang pendek dan terkenal, jangan mengarang. Balas hanya JSON: {"ref":""}');ref=String(r0.ref||'').trim()}
+try{const q=ref.split(':');if(!/^(bukhari|muslim)$/.test(q[0]))throw new Error('kode sumber salah: '+ref);const n0=+q[1];HERR={};for(let k=0;k<16;k++){const d=await getHadith(q[0],n0+k);if(!d){if(k==0&&Object.keys(HERR).length)break;continue}if(used.has(d.arab))continue;if(d.arab.length<=420&&d.id.length<=600){h={arab:d.arab,id:d.id,rj:'HR. '+({bukhari:'Bukhari',muslim:'Muslim'})[q[0]]+' no. '+d.number,dj:'shahih',urls:[{uri:'https://github.com/fawazahmed0/hadith-api',title:d.src}]};how='teks';hbkAdd({ar:d.arab,id:d.id,rj:h.rj,tag:''});break}}if(!h)eS='Hadits tidak bisa diambil dari sumber mana pun. Alasan: '+(Object.entries(HERR).map(e=>e[0]+' = '+e[1]).join('; ')||'tidak ada hadits yang cocok')}catch(e){eS=e.message}
+if(!h)lg('   Sumber hadis langsung gagal: '+eS)}
+if(!h){try{lg('   Mencari hadis lewat pencarian web (agen)...');h=await webHadis(x,used,hasan);how='web'}catch(e){lg('   Pencarian hadis gagal: '+String(e.message).slice(0,120))}}
+if(!h){const b=pilihHB(x,used,1)[0];if(b){h={arab:b.ar,id:b.id,rj:b.rj,dj:'shahih',urls:[]};how='bank';lg('   Memakai bank hadis (belum terpakai). WAJIB dicek ulang. Jalankan "Tes koneksi sumber" di Pengaturan untuk melihat penyebab sumber gagal.')}}
+if(!h&&man){h={arab:man.arab,id:man.id,rj:x.rujukan||'Hadis (teks manual)',dj:'',urls:[]};how='bank'}
+if(!h)throw new Error('Tidak ada hadis yang belum terpakai dan sumber internet gagal ('+eS+'). Jalankan "Tes koneksi sumber" di Pengaturan, atau coba lagi nanti. Program sengaja tidak mengulang hadis yang sama.');
+x.pg=[{arab:h.arab,id:h.id,lb:h.rj}];x.rujukan=h.rj+(h.dj?' (derajat: '+h.dj+')':'');x.ket=x.rujukan;x.ver=how=='teks'?'teks':how=='web'?'web':'bank';
+setSrc(x,h.rj+(h.dj?' · derajat '+h.dj:'')+(how=='teks'?' · hadith-api':''),h.urls||[]);
+let ok=false;
+try{const f=await agenFakta(x,'Cari penjelasan makna hadis ini menurut ulama (syarah seperti Fathul Bari, Syarah Shahih Muslim An-Nawawi, Syarah Arbain, Ibnu Rajab): "'+h.id+'" ('+h.rj+'). Sertakan pelajaran dan konteks hadis bila ada.');ok=await tulisPenjelasan(x,'HADIS: '+h.id+' ('+h.rj+')\n'+f.teks,'80 sampai 110','Sub-tema: '+x.sub+'. ');if(ok)setSrc(x,h.rj+(h.dj?' · derajat '+h.dj:'')+' · syarah: '+f.nama,(h.urls||[]).concat(f.urls))}catch(e){lg('   Syarah dari web gagal ('+String(e.message).slice(0,100)+').')}
+if(!ok){ok=await tulisPenjelasan(x,'HADIS: '+h.id+' ('+h.rj+')\n','55 sampai 75','Tidak ada syarah ulama. Tulis renungan sederhana yang HANYA menjelaskan arti redaksi hadis di atas, tanpa menambah dalil lain dan tanpa menyebut nama ulama. Awali dengan kalimat: Ini renungan sederhana dari redaksi hadis tersebut, bukan penjelasan ulama. ');if(ok)lg('   Memakai renungan sederhana (diberi label bukan penjelasan ulama).')}
+if(!x.judul||!ok)x.judul=await judulDari(x,h.id,'sesuai isi hadis')||'Pengingat dari hadis Nabi';
+if(!ok){const more=pilihHB(x,new Set([...used,h.arab]),1)[0];if(more){x.pg.push({arab:more.ar,id:more.id,lb:more.rj});x.rujukan+=' + '+more.rj;lg('   Menambah satu hadis lain agar isi cukup.')}}
+finalPages(x,'#Hadis #Sunnah #Islami #Dakwah #Ngelingan');if(x.capExtra)x.caption=x.judul+'\n'+x.rujukan+'\n\n'+x.capExtra+'\n\nSumber: '+x.sumber}
+async function modeDoaq(x){const t=(x.tema||x.sub||'').toLowerCase(),usedR=new Set(S.items.filter(i=>i.id!=x.id).slice(-16).flatMap(i=>String(i.ref||'').split(';'))),pool=DOA.filter(d=>!usedR.has(d.ref)),pl=pool.length>=3?pool:DOA,tg=pl.filter(d=>d.tag.split(' ').some(z=>z.length>3&&t.includes(z))),ord=tg.concat(pl.filter(d=>!tg.includes(d)));
+const pick=[];x.pg=[];const kt=[];let es=0;for(const dd of ord){if(pick.length>=5||(es>=32&&pick.length>=2))break;const q=dd.ref.split(':');let sd,a;try{sd=await getSurah(+q[0]);a=sd.ay[+q[1]-1]}catch(e){if(!pick.length)throw e;continue}if(!a)continue;pick.push(dd);x.pg.push({arab:a.arab,id:a.id,lb:dd.judul+' · QS. '+sd.nm+': '+a.n,au:qariUrls(dd.ref,a.glob)});kt.push('surat '+sd.nm+' ayat '+a.n);es+=a.arab.length*.07+a.id.split(' ').length/2.2+3}if(!pick.length)throw new Error('Doa dari Al-Quran tidak bisa diambil')
+x.ref=pick.map(d=>d.ref).join(';');x.judul=pick.length==1?pick[0].judul:pick.length+' Doa dari Al-Quran'+(x.tema?' tentang '+x.tema:' untuk hatimu');
+x.ket='Dari Al-Quran: '+kt.join(', ');x.rujukan=x.ket;x.ver='teks';setSrc(x,'Al-Quran · terjemah Indonesia · alquran.cloud',[{uri:'https://alquran.cloud',title:'alquran.cloud'}]);lg('   '+pick.length+' doa dari Al-Quran: '+pick.map(d=>d.judul).join(' | '));
+finalPages(x,'#Doa #DoaDariAlQuran #Islami #Dakwah #Ngelingan')}
+async function modeDoah(x){const usedA=usedArab(x);let L=[],how='',urls=[];
+try{lg('   Mencari doa dan zikir dari hadis lewat pencarian web (agen)...');const g=await aiGround('Cari di web 4 doa atau zikir dari hadis shahih (utamakan Shahih Bukhari dan Muslim) untuk sub-tema "'+x.sub+'"'+(x.tema?' bertema "'+x.tema+'"':'')+'. Setiap item: "judul" judul doa singkat (contoh "Doa Meminta Ampunan"), "arab" teks Arab berharakat PERSIS dari sumber (maksimal 300 huruf), "terjemah" Indonesia, "sumber" kitab dan nomor hadis bila tertulis, "derajat". Jangan mengarang. Hindari yang sudah dipakai: '+[...usedA].slice(-8).map(z=>z.slice(0,25)).join(' | ')+'. Balas hanya JSON array: [{"judul":"","arab":"","terjemah":"","sumber":"","derajat":""}]');
+if(Array.isArray(g.j)&&g.src.length){L=g.j.filter(d=>d&&d.arab&&d.terjemah&&d.judul&&d.arab.length>8&&d.arab.length<=320&&!usedA.has(d.arab)).slice(0,4).map(d=>({judul:d.judul,ar:d.arab,id:d.terjemah,rj:'HR. '+String(d.sumber||'').replace(/^HR\.?\s*/i,''),dj:String(d.derajat||'').toLowerCase()}));if(L.length>=2){how='web';urls=g.src.slice(0,3)}else L=[]}}catch(e){lg('   Pencarian doa gagal ('+String(e.message).slice(0,100)+').');L=[]}
+if(!L.length){const t=(x.tema||x.sub||'').toLowerCase(),c=DOAH.filter(d=>!usedA.has(d.ar)),pl=c.length>=2?c:DOAH,tg=pl.filter(d=>d.tag.split(' ').some(z=>z.length>3&&t.includes(z)));const od=tg.concat(pl.filter(d=>!tg.includes(d)));L=[];let es=0;for(const d of od){if(L.length>=5||(es>=32&&L.length>=2))break;L.push(d);es+=d.ar.length*.07+d.id.split(' ').length/2.2+3}how='bank';lg('   Memakai bank doa hadis bawaan program (shahih). Periksa penulisan Arabnya.')}
+x.pg=L.map(d=>({arab:d.ar,id:d.id,lb:d.judul+' · '+d.rj}));x.judul=L.length==1?L[0].judul:L.length+' Doa dan Zikir dari Hadis';x.ket='Dari hadis: '+L.map(d=>d.rj).join('; ');x.rujukan=x.ket;x.ver=how=='web'?'web':'bank';
+setSrc(x,L.map(d=>d.rj+(d.dj?' ('+d.dj+')':'')).join('; '),urls);finalPages(x,'#Doa #Zikir #DoaHarian #Islami #Ngelingan')}
+async function modeAsma(x){let nm=[];
+try{const L=(await(await tmo('https://api.aladhan.com/v1/asmaAlHusna')).json()).data,u=usedArab(x),f=L.filter(z=>!u.has(z.name)),cp=(f.length>=3?f:L).slice();while(nm.length<3&&cp.length)nm.push(cp.splice(Math.floor(Math.random()*cp.length),1)[0]);lg('   Nama dari daftar Asmaul Husna (aladhan.com): '+nm.map(z=>z.transliteration).join(', '))}catch(e){lg('   Daftar sumber gagal ('+e.message+').')}
+let ar;if(nm.length){ar=await ai('Tulis arti singkat dalam Bahasa Indonesia yang baku menurut ulama untuk tiga nama Allah berikut: '+nm.map(z=>z.transliteration+' (arti Inggris: '+z.en.meaning+')').join('; ')+'. Balas hanya JSON array berurutan: [{"latin":"","arti":""}]');x.ver='teks'}
+else{ar=await ai('Pilih tiga nama dari 99 Asmaul Husna yang sesuai tema "'+(x.tema||'bebas')+'". Balas hanya JSON array: [{"arab":"nama Arab berharakat","latin":"","arti":"arti singkat Indonesia"}]');nm=ar.map(a=>({name:a.arab,transliteration:a.latin}));x.ver='ai'}
+if(!Array.isArray(ar)||!ar.length)throw new Error('Nama Asmaul Husna tidak didapat');
+x.pg=nm.map((z,i)=>({arab:z.name,id:(ar[i]&&ar[i].latin||z.transliteration)+': '+(ar[i]&&ar[i].arti||''),lb:'Asmaul Husna'+(z.number?' ke-'+z.number:'')}));
+x.judul=nm.length+' Nama Allah: '+nm.map(z=>z.transliteration).join(', ');x.rujukan='Asmaul Husna';x.ket='Mengenal Allah lewat Asmaul Husna';setSrc(x,'Daftar Asmaul Husna · aladhan.com',[{uri:'https://aladhan.com',title:'aladhan.com'}]);
+let ok=false;try{const f=await agenFakta(x,'Cari penjelasan makna nama-nama Allah ini menurut ulama (misalnya Ibnu Katsir, As-Sa\u2019di, Al-Ghazali, Ibnul Qayyim) beserta dalil Al-Quran atau hadis dan cara mengamalkannya: '+nm.map(z=>z.transliteration).join(', ')+'. Sertakan dalil bahwa Allah memiliki Asmaul Husna.');ok=await tulisPenjelasan(x,'NAMA ALLAH: '+x.pg.map(p=>p.id).join('; ')+'\n'+f.teks,'80 sampai 110','Sub-tema: Asmaul Husna. ');if(ok)setSrc(x,'Asmaul Husna · aladhan.com · '+f.nama,[{uri:'https://aladhan.com',title:'aladhan.com'}].concat(f.urls))}catch(e){lg('   Penjelasan dari web gagal ('+String(e.message).slice(0,100)+').')}
+if(!ok){try{const w=await wikiFind('Asmaul Husna');ok=await tulisPenjelasan(x,'NAMA ALLAH: '+x.pg.map(p=>p.id).join('; ')+'\nTEKS SUMBER (Wikipedia: '+w.title+'):\n"""'+w.text+'"""\n','75 sampai 100','Sub-tema: Asmaul Husna. Jelaskan Asmaul Husna secara umum dari teks. ');if(ok)setSrc(x,'Asmaul Husna · aladhan.com · Wikipedia: '+w.title,[{uri:'https://aladhan.com',title:'aladhan.com'},{uri:w.url,title:host(w.url)}])}catch(e){lg('   Wikipedia gagal ('+String(e.message).slice(0,80)+').')}}
+finalPages(x,'#AsmaulHusna #NamaNamaAllah #Islami #Dakwah #Ngelingan');if(x.capExtra)x.caption=x.judul+'\n\n'+x.pg.map(p=>p.arab+' - '+p.id).join('\n')+'\n\n'+x.capExtra+'\n\nSumber: '+x.sumber}
+async function srcWiki(x,rc,tema){const jn=x.jenis,fmt=' Balas hanya JSON: {"cari":"judul artikel Wikipedia bahasa Indonesia","cari_en":"judul artikel Wikipedia bahasa Inggris"}',wilOk=jn=='Sejarah & kisah Islam'&&/peradaban|Peristiwa/.test(x.sub||'');
+const q=await ai('Pilih satu topik untuk konten "'+x.sub+'" (pilar '+jn+')'+(wilOk?' di wilayah "'+x.wil+'"':'')+(tema?' dengan tema "'+tema+'"':'')+': berupa tokoh, peristiwa, kerajaan atau kesultanan, kota, atau peradaban yang punya artikel Wikipedia dan layak jadi teladan atau pengetahuan baru. Hindari topik yang mirip: '+rc+'.'+fmt);
+let w=null,er=null;try{w=await wikiFind(q.cari)}catch(e){er=e}if(!w&&q.cari_en){try{w=await wikiFind(q.cari_en,['en'])}catch(e){er=e}}if(!w)throw er||new Error('artikel tidak ditemukan');
+lg('   Artikel sumber: '+w.title+' (Wikipedia '+w.lang+').');return{teks:'TEKS SUMBER (Wikipedia: '+w.title+'):\n"""'+w.text+'"""\n',nama:'Wikipedia: '+w.title,urls:[{uri:w.url,title:host(w.url)}],ver:'wiki'}}
+async function srcWeb(x,rc,tema){return agenFakta(x,webTask(x,tema),rc)}
+function terapkan(x,h){const r=h.r;x.judul=r.judul||x.judul;x.ket=r.ket||x.sub||x.jenis;x.narasi=String(r.narasi).trim();
+x.hashtag=(Array.isArray(r.hashtag)?r.hashtag:String(r.hashtag||'').split(/\s+/)).filter(Boolean).slice(0,5).map(z=>z[0]=='#'?z:'#'+z).join(' ');
+setSrc(x,h.nama,h.urls||[]);x.rujukan=h.nama;x.ver=h.ver;x.pg=null;x.arab='';x.terjemah='';
+x.caption=(r.caption||x.judul)+'\n\nSumber: '+h.nama+(x.sumberLink.length?' ('+x.sumberLink.join(', ')+')':'')+(h.ver=='ai'?' (belum diverifikasi)':'');
+let ad=(Array.isArray(r.adegan)?r.adegan:[]).filter(a=>a&&ADG.includes(a.scene)).slice(0,5).map(a=>({scene:a.scene,chip:String(a.chip||'').slice(0,40)}));
+const rs=(x.jenis=='Sejarah & kisah Islam'&&x.wil)?regSc(x.wil+' '+(r.ket||'')+' '+h.nama):'';
+if(rs&&(!ad.length||ad[0].scene!=rs))ad.unshift({scene:rs,chip:''});
+const pl=(POOL[x.jenis]||ADG).slice();while(ad.length<3){const s=pkR(pl);if(!ad.length||ad[ad.length-1].scene!=s)ad.push({scene:s,chip:''})}
+ad=ad.filter((a,i)=>!i||a.scene!=ad[i-1].scene).slice(0,5);if(ad.length<2)ad.push({scene:pkR(pl.filter(z=>z!=ad[0].scene)),chip:''});
+x.ad=ad;x.scene=ad[0].scene;x.tata=LAY.includes(r.tata)?r.tata:pickLay(x);x.prompt=r.prompt_gambar||'Vertical illustrated landscape, '+x.scene.replace(/-/g,' ')+', no people, no text'}
+async function buatBersumber(x){const jn=x.jenis,rc=S.items.filter(i=>i.id!=x.id).slice(-40).map(i=>i.judul).filter(Boolean).join('; ')||'-',tema=(x.tema||'').trim(),len='130 sampai 160';
+if(jn=='Sejarah & kisah Islam'&&!x.wil&&/peradaban|Peristiwa/.test(x.sub||''))x.wil=pilihWil(x);
+const urut=jn=='Sejarah & kisah Islam'?['wiki','web']:['web','wiki'];let h=null;const gagal=[],NM={wiki:'Wikipedia',web:'pencarian web (agen)'};
+lg('   Agen mencari sumber'+(x.wil&&/peradaban|Peristiwa/.test(x.sub||'')?' (wilayah: '+x.wil+')':'')+'...');
+for(const k of urut){try{lg('   Mencoba '+NM[k]+'...');const s=k=='wiki'?await srcWiki(x,rc,tema):await srcWeb(x,rc,tema);
+const ex=(s.ver=='wiki'&&jn!='Sejarah & kisah Islam'?'Sumber berupa artikel ensiklopedia; tuliskan hanya yang memang tertulis di artikel. ':'')+(tema?'Tema: '+tema+'. ':'');
+const r=await ai(tulisPrompt(x,len,s.teks,ex));if(r.tidak_relevan||!r.narasi||String(r.narasi).split(/\s+/).length<85)throw new Error('naskah dari bahan ini kurang lengkap');
+h={r,nama:s.nama,urls:s.urls,ver:s.ver};lg('   Sumber dipakai: '+s.nama);break}catch(e){lg('   '+NM[k]+' gagal: '+String(e.message).slice(0,140));gagal.push(NM[k]+': '+String(e.message).slice(0,70))}}
+if(!h&&S.cfg.sb=='ai'){lg('   Sumber tidak ditemukan. Pengaturan mengizinkan teks AI, hasil WAJIB dicek.');try{const r=await ai(tulisPrompt(x,len,'','TIDAK ADA bahan sumber. Pilih hanya hal yang sangat terkenal dan pasti benar; bila ragu sedikit pun balas {"tidak_relevan":true}. '+(tema?'Tema: '+tema+'. ':'')+'Hindari yang mirip: '+rc+'. '));if(r.tidak_relevan||!r.narasi)throw new Error('AI tidak yakin');h={r,nama:'Teks AI, belum diverifikasi',urls:[],ver:'ai'}}catch(e){gagal.push('AI: '+e.message)}}
+if(!h)throw new Error('Sumber terpercaya tidak ditemukan ('+gagal.join('; ')+'). Konten ini sengaja tidak dibuat dari tebakan AI. Coba lagi nanti atau ubah pilihan "Jika sumber tidak ditemukan" di Pengaturan.');
+terapkan(x,h);lg('2/4 Naskah selesai ('+x.narasi.split(/\s+/).length+' kata, '+x.ad.length+' adegan).')}
+async function siapkanKonten(x){migr(x);x.ver='';x.sumberUrl=[];x.sumberLink=[];x.capExtra='';x.narasi='';x.ad=null;if(!x.sub)x.sub=pilihSub(x);const m=modeKonten(x);x.mode=m;
+lg('1/4 Pilar: '+x.jenis+' · '+x.sub+' ('+m+')');
+if(m=='quran')await modeQuran(x);else if(m=='hadis')await modeHadis(x);else if(m=='doaq')await modeDoaq(x);else if(m=='doah')await modeDoah(x);else if(m=='asma')await modeAsma(x);else{x.arab='';x.terjemah='';await buatBersumber(x)}
+if(m!='narasi'){x.arab='';x.terjemah='';lg('2/4 Dalil dan penjelasan siap'+(x.narasi?' (penjelasan '+x.narasi.split(/\s+/).length+' kata).':' (tanpa penjelasan).'))}}
+
+/* --- latar baru: pola geometri, lentera, interior masjid, perkamen, aurora, karavan, kapal, dan kota-kota dunia Islam --- */
+const ga=(c,a)=>{const k=hx(c);return 'rgba('+k[0]+','+k[1]+','+k[2]+','+a+')'};
+function star(g,cx,cy,R1,R2,n,rot){g.beginPath();for(let i=0;i<n*2;i++){const a=rot+i*Math.PI/n-Math.PI/2,q=i%2?R2:R1;i?g.lineTo(cx+Math.cos(a)*q,cy+Math.sin(a)*q):g.moveTo(cx+Math.cos(a)*q,cy+Math.sin(a)*q)}g.closePath()}
+function dome(g,x,y,w,h,col,sh){g.fillStyle=col;g.beginPath();
+if(sh==1){g.moveTo(x-w*.5,y);g.bezierCurveTo(x-w*.62,y-h*.45,x-w*.2,y-h*.65,x,y-h);g.bezierCurveTo(x+w*.2,y-h*.65,x+w*.62,y-h*.45,x+w*.5,y)}
+else if(sh==2){g.moveTo(x-w*.5,y);g.bezierCurveTo(x-w*.5,y-h*.6,x-w*.2,y-h*.85,x,y-h);g.bezierCurveTo(x+w*.2,y-h*.85,x+w*.5,y-h*.6,x+w*.5,y)}
+else{g.moveTo(x-w*.5,y);g.bezierCurveTo(x-w*.5,y-h*1.33,x+w*.5,y-h*1.33,x+w*.5,y)}
+g.closePath();g.fill()}
+function minaret(g,x,y,h,w,col,roof){g.fillStyle=col;g.fillRect(x-w/2,y-h,w,h);g.fillRect(x-w*.85,y-h*.74,w*1.7,Math.max(2,h*.03));g.fillRect(x-w*.85,y-h*.4,w*1.7,Math.max(2,h*.025));g.fillStyle=roof||col;g.beginPath();g.moveTo(x-w*.75,y-h);g.lineTo(x,y-h*1.2);g.lineTo(x+w*.75,y-h);g.closePath();g.fill();g.fillRect(x-.8,y-h*1.3,1.6,h*.12)}
+function fanous(g,x,y,s,fl,col){g.save();g.globalCompositeOperation='screen';let q=g.createRadialGradient(x,y,2,x,y,s*3.4);q.addColorStop(0,'rgba(255,196,90,'+(.55*fl)+')');q.addColorStop(1,'rgba(255,196,90,0)');g.fillStyle=q;g.fillRect(x-s*3.4,y-s*3.4,s*6.8,s*6.8);g.restore();
+g.fillStyle=col;g.beginPath();g.moveTo(x-s*.28,y-s*1.12);g.lineTo(x+s*.28,y-s*1.12);g.lineTo(x+s*.56,y-s*.72);g.lineTo(x-s*.56,y-s*.72);g.closePath();g.fill();g.fillRect(x-s*.07,y-s*1.4,s*.14,s*.3);
+const b=g.createLinearGradient(0,y-s*.7,0,y+s*.8);b.addColorStop(0,'rgba(255,220,130,'+(.8+.2*fl)+')');b.addColorStop(1,'rgba(255,140,50,'+(.75+.2*fl)+')');g.fillStyle=b;g.beginPath();g.moveTo(x-s*.56,y-s*.72);g.quadraticCurveTo(x-s*.9,y,x-s*.42,y+s*.78);g.lineTo(x+s*.42,y+s*.78);g.quadraticCurveTo(x+s*.9,y,x+s*.56,y-s*.72);g.closePath();g.fill();
+g.strokeStyle=col;g.lineWidth=Math.max(1,s*.07);[-.3,0,.3].forEach(d=>{g.beginPath();g.moveTo(x+d*s*.9,y-s*.72);g.quadraticCurveTo(x+d*s*1.5,y,x+d*s*.7,y+s*.78);g.stroke()});
+g.fillStyle=col;g.fillRect(x-s*.5,y+s*.78,s,s*.14);g.beginPath();g.moveTo(x-s*.12,y+s*.92);g.lineTo(x+s*.12,y+s*.92);g.lineTo(x,y+s*1.3);g.closePath();g.fill()}
+function camel(g,x,y,s,t,col){g.fillStyle=col;g.strokeStyle=col;g.lineCap='round';g.lineWidth=s*.07;
+[[-.34,0],[-.2,Math.PI],[.22,Math.PI*.5],[.36,Math.PI*1.5]].forEach(q=>{const a=Math.sin(t*3.2+q[1])*.3;g.beginPath();g.moveTo(x+q[0]*s,y-s*.42);g.lineTo(x+q[0]*s+Math.sin(a)*s*.28,y);g.stroke()});
+g.beginPath();g.ellipse(x,y-s*.55,s*.48,s*.19,0,0,6.3);g.fill();g.beginPath();g.ellipse(x-s*.06,y-s*.74,s*.17,s*.16,0,0,6.3);g.fill();
+g.lineWidth=s*.11;g.beginPath();g.moveTo(x+s*.36,y-s*.6);g.quadraticCurveTo(x+s*.6,y-s*.72,x+s*.62,y-s*1.0);g.stroke();
+g.beginPath();g.ellipse(x+s*.7,y-s*1.05,s*.14,s*.07,-.25,0,6.3);g.fill();g.lineWidth=s*.03;g.beginPath();g.moveTo(x-s*.46,y-s*.58);g.quadraticCurveTo(x-s*.56,y-s*.4,x-s*.52,y-s*.28);g.stroke()}
+function dhow(g,x,y,s,t,col,sail){g.save();g.translate(x,y+Math.sin(t*.9)*s*.04);g.rotate(Math.sin(t*.7)*.025);g.fillStyle=col;g.beginPath();g.moveTo(-s*.9,-s*.08);g.quadraticCurveTo(-s*.5,s*.26,s*.1,s*.26);g.quadraticCurveTo(s*.7,s*.2,s*1.0,-s*.3);g.lineTo(s*.8,-s*.12);g.lineTo(-s*.75,-s*.12);g.closePath();g.fill();
+g.fillRect(-s*.05,-s*1.4,s*.05,s*1.3);g.fillStyle=sail;g.beginPath();g.moveTo(-s*.02,-s*1.4);g.lineTo(-s*.02,-s*.15);g.lineTo(s*.95,-s*.2);g.closePath();g.fill();g.beginPath();g.moveTo(-s*.08,-s*1.0);g.lineTo(-s*.08,-s*.15);g.lineTo(-s*.62,-s*.15);g.closePath();g.fill();g.restore()}
+function scGeo(g,r,R,addCloud,pick){const W=540,H=960,P=pick([['#07222f','#0f5a70','#e2bb62'],['#220b33','#5b2a78','#f1c96f'],['#052a2c','#0f6a62','#ead58f'],['#141a45','#2c3f93','#ffd37a'],['#33100e','#7d2b25','#f2c777'],['#0b2a1d','#1f7048','#eed992']]),gold=P[2];
+let q=g.createRadialGradient(270,440,30,270,480,780);q.addColorStop(0,P[1]);q.addColorStop(1,P[0]);g.fillStyle=q;g.fillRect(0,0,W,H);
+const S0=90+Math.floor(r()*24),m8=r()<.55;g.lineJoin='round';
+const tile=(cx,cy)=>{if(m8){star(g,cx,cy,S0*.5,S0*.3,8,0);g.fillStyle=ga(gold,.1);g.fill();g.strokeStyle=ga(gold,.8);g.lineWidth=1.6;g.stroke();star(g,cx,cy,S0*.3,S0*.2,8,Math.PI/8);g.strokeStyle=ga(gold,.45);g.lineWidth=1.2;g.stroke();g.beginPath();g.arc(cx,cy,S0*.07,0,6.3);g.fillStyle=ga(gold,.7);g.fill()}
+else{star(g,cx,cy,S0*.54,S0*.31,6,0);g.fillStyle=ga(gold,.1);g.fill();g.strokeStyle=ga(gold,.8);g.lineWidth=1.6;g.stroke();g.beginPath();for(let k=0;k<6;k++){const a=k*Math.PI/3,xx=cx+Math.cos(a)*S0*.27,yy=cy+Math.sin(a)*S0*.27;k?g.lineTo(xx,yy):g.moveTo(xx,yy)}g.closePath();g.strokeStyle=ga(gold,.4);g.lineWidth=1.2;g.stroke();g.beginPath();g.arc(cx,cy,S0*.06,0,6.3);g.fillStyle=ga(gold,.7);g.fill()}};
+if(m8){for(let j=-1;j*S0*.9<H+S0;j++)for(let i=-1;i*S0<W+S0;i++){const cx=i*S0+(j&1?S0/2:0),cy=j*S0*.9;tile(cx,cy);star(g,cx+S0/2,cy+S0*.45,S0*.12,S0*.06,4,0);g.fillStyle=ga(gold,.5);g.fill()}}
+else{for(let j=-1;j*S0*.866<H+S0;j++)for(let i=-1;i*S0<W+S0;i++)tile(i*S0+(j&1?S0/2:0),j*S0*.866)}
+q=g.createRadialGradient(270,470,40,270,470,330);q.addColorStop(0,'rgba(0,0,0,.5)');q.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=q;g.fillRect(0,0,W,H);
+q=g.createRadialGradient(270,480,200,270,480,720);q.addColorStop(0,'rgba(0,0,0,0)');q.addColorStop(1,'rgba(0,0,0,.6)');g.fillStyle=q;g.fillRect(0,0,W,H);R.gold=gold;R.kind='geo';R.kb=2}
+function scLantern(g,r,R,addCloud,pick){const W=540,H=960,P=pick([['#0a1030','#2a2f78','#6c4a9a'],['#05122a','#143a6a','#3c7a9a'],['#150a2e','#4a2a6e','#c46a7a']]);
+g.fillStyle=gr2(g,0,H,[[0,P[0]],[.6,P[1]],[1,P[2]]]);g.fillRect(0,0,W,H);
+for(let i=0;i<140;i++){g.fillStyle='rgba(255,255,255,'+(.2+r()*.7)+')';const s=.5+r()*1.7;g.fillRect(r()*W,r()*H*.7,s,s)}
+const mx=90+r()*360,my=190+r()*90;g.fillStyle='#f7f0cf';g.beginPath();g.arc(mx,my,48,0,6.3);g.fill();g.fillStyle=mix2(hx(P[0]),hx(P[1]),.4);g.beginPath();g.arc(mx+21,my-8,43,0,6.3);g.fill();sunGlow(g,mx,my,190,.3);
+hillF(g,wv(r,3,18,.012),H*.77,'#0b1033');mosqueBig(g,140+r()*260,H*.77+4,98,'#070a24','#ffd36a');hillF(g,wv(r,3,12,.016),H*.85,'#060820');
+for(let i=0;i<4;i++)palm(g,30+r()*480,H*.86+r()*50,170+r()*120,'#050718',(r()-.5)*1.6);g.fillStyle='#04050f';g.fillRect(0,H*.93,W,H);
+R.lan=Array.from({length:6+Math.floor(r()*3)},()=>({x:30+r()*480,len:110+r()*420,s:15+r()*13,ph:r()*6.28,c:pick(['#7a4a1a','#8a5a22','#6a3a18'])})).sort((a,b)=>a.s-b.s);R.kind='lantern'}
+function scInterior(g,r,R,addCloud,pick){const W=540,H=960,P=pick([['#3a2412','#c9923f','#ffe3a0'],['#0f3a3d','#2a9aa0','#c6f2e8'],['#16301f','#3f8f5c','#f0e6b0'],['#2a1840','#8a5ac0','#ffd9f0']]),c0=hx(P[0]),c1=hx(P[1]);
+g.fillStyle=mix2(c0,[0,0,0],.45);g.fillRect(0,0,W,H);const n=7,vy=470,cx=270;let last=null;
+for(let i=0;i<n;i++){const s=1.4-i*.17,hw=205*s,yb=vy+205*s,ya=yb-540*s,ys=ya+hw*1.25;
+const path=()=>{g.beginPath();g.moveTo(cx-hw,yb);g.lineTo(cx-hw,ys);g.bezierCurveTo(cx-hw,ys-(ys-ya)*.5,cx-hw*.3,ya+(ys-ya)*.12,cx,ya);g.bezierCurveTo(cx+hw*.3,ya+(ys-ya)*.12,cx+hw,ys-(ys-ya)*.5,cx+hw,ys);g.lineTo(cx+hw,yb);g.closePath()};
+path();g.fillStyle=i==n-1?gr2(g,ya,yb,[[0,P[2]],[1,mix2(hx(P[2]),c1,.5)]]):mix2(c0,c1,i/(n-1)*.9);g.fill();g.strokeStyle=ga(P[2],.55);g.lineWidth=Math.max(1.5,4*s);g.stroke();last={yb,hw,ya}}
+const lg2=g.createLinearGradient(0,last.yb,0,H);lg2.addColorStop(0,'rgba(120,30,40,.55)');lg2.addColorStop(1,'rgba(90,20,30,.95)');g.fillStyle=lg2;g.beginPath();g.moveTo(cx-last.hw*.6,last.yb);g.lineTo(cx+last.hw*.6,last.yb);g.lineTo(cx+270,H);g.lineTo(cx-270,H);g.closePath();g.fill();
+g.strokeStyle=ga(P[2],.5);g.lineWidth=2;for(let k=0;k<9;k++){const t=Math.pow((k+1)/10,1.7),y=last.yb+(H-last.yb)*t,hw2=last.hw*.6+(270-last.hw*.6)*t;g.beginPath();g.moveTo(cx-hw2,y);g.lineTo(cx+hw2,y);g.stroke()}
+g.beginPath();g.moveTo(cx-last.hw*.6,last.yb);g.lineTo(cx-270,H);g.moveTo(cx+last.hw*.6,last.yb);g.lineTo(cx+270,H);g.stroke();
+g.strokeStyle='rgba(30,20,10,.8)';g.lineWidth=2;g.beginPath();g.moveTo(cx,0);g.lineTo(cx,175);g.stroke();let q=g.createRadialGradient(cx,190,2,cx,190,150);q.addColorStop(0,'rgba(255,225,150,.9)');q.addColorStop(.3,'rgba(255,200,110,.35)');q.addColorStop(1,'rgba(255,200,110,0)');g.fillStyle=q;g.fillRect(cx-150,40,300,300);
+g.fillStyle='#e8c46a';g.beginPath();g.arc(cx,190,13,0,6.3);g.fill();g.fillRect(cx-18,176,36,5);
+R.rays=Array.from({length:4},()=>({x:40+r()*320,w:26+r()*40,d:70+r()*130,a:.05+r()*.05,p:r()*6}));R.kind='inter';R.kb=1}
+function scParch(g,r,R,addCloud,pick){const W=540,H=960,P=pick([['#5a3d22','#241609'],['#3d3020','#150f08'],['#4a2f2a','#1c0f0d']]),gold='#d8b25a';
+let q=g.createRadialGradient(270,470,60,270,480,720);q.addColorStop(0,P[0]);q.addColorStop(1,P[1]);g.fillStyle=q;g.fillRect(0,0,W,H);
+for(let i=0;i<900;i++){g.strokeStyle='rgba(255,230,170,'+(.015+r()*.04)+')';g.lineWidth=.6+r();const x=r()*W,y=r()*H,l=4+r()*18,a=r()*6.28;g.beginPath();g.moveTo(x,y);g.lineTo(x+Math.cos(a)*l,y+Math.sin(a)*l);g.stroke()}
+star(g,270,470,240,160,8,0);g.strokeStyle=ga(gold,.08);g.lineWidth=2;g.stroke();star(g,270,470,160,105,8,Math.PI/8);g.stroke();g.beginPath();g.arc(270,470,250,0,6.3);g.stroke();
+g.strokeStyle=ga(gold,.75);g.lineWidth=3;g.strokeRect(22,22,W-44,H-44);g.lineWidth=1.2;g.strokeRect(34,34,W-68,H-68);
+[[34,34,1,1],[W-34,34,-1,1],[34,H-34,1,-1],[W-34,H-34,-1,-1]].forEach(a=>{g.save();g.translate(a[0],a[1]);g.scale(a[2],a[3]);g.lineWidth=1.6;g.strokeStyle=ga(gold,.8);g.beginPath();g.arc(0,0,40,0,Math.PI/2);g.stroke();star(g,16,16,13,6,8,0);g.stroke();g.restore()});
+g.lineWidth=1.6;g.strokeStyle=ga(gold,.8);g.beginPath();g.arc(270,34,46,0,Math.PI);g.stroke();star(g,270,64,10,5,8,0);g.stroke();g.beginPath();g.arc(270,H-34,46,Math.PI,0);g.stroke();star(g,270,H-64,10,5,8,0);g.stroke();
+q=g.createRadialGradient(270,480,250,270,480,740);q.addColorStop(0,'rgba(0,0,0,0)');q.addColorStop(1,'rgba(0,0,0,.55)');g.fillStyle=q;g.fillRect(0,0,W,H);R.kind='parch';R.kb=1}
+function scAurora(g,r,R,addCloud,pick){const W=540,H=960,cs=pick([['70,255,170','90,200,255','170,120,255'],['90,220,255','120,255,190','255,140,200'],['120,255,160','255,230,120','150,150,255']]);
+g.fillStyle=gr2(g,0,H,[[0,'#02061a'],[.5,'#0a2440'],[1,'#0e3a46']]);g.fillRect(0,0,W,H);
+for(let i=0;i<200;i++){g.fillStyle='rgba(255,255,255,'+(.2+r()*.7)+')';const s=.5+r()*1.6;g.fillRect(r()*W,r()*H*.65,s,s)}
+const wy=H*.76;for(let i=0;i<4;i++)mtn(g,r,r()*W,wy,220+r()*160,90+r()*130,'#0a1a2c','#050e1c');
+hillF(g,wv(r,3,14,.013),wy+6,'#04101c');pineRow(g,r,wy+8,12,52,'#030c16');lakeFx(g,r,wy+8,'#0e3a46','#02101a');
+R.au=cs.map((c,i)=>({c,b:170+i*70+r()*40,p:r()*6.28,am:26+r()*22}));R.kind='aurora'}
+function scCaravan(g,r,R,addCloud,pick){const W=540,H=960,hz=H*.58,P=pick([['#1d2a5e','#d0626a','#ffc47a'],['#2c1a4e','#e0785a','#ffd68a'],['#18305f','#c9a070','#ffe6b0']]),sx=100+r()*340,h3=hx(P[2]);
+g.fillStyle=gr2(g,0,hz+60,[[0,P[0]],[.55,P[1]],[1,P[2]]]);g.fillRect(0,0,W,H);
+for(let i=0;i<110;i++){g.fillStyle='rgba(255,255,255,'+(.15+r()*.6)+')';const s=.5+r()*1.4;g.fillRect(r()*W,r()*hz*.55,s,s)}
+sunGlow(g,sx,hz-30,260,1);g.fillStyle='#fff1c8';g.beginPath();g.arc(sx,hz-34,44,0,6.3);g.fill();
+hillF(g,wv(r,3,22,.008),hz+30,mix2([120,70,80],h3,.55));R.ry=hz+120;R.rf=wv(r,2,9,.011);hillF(g,R.rf,R.ry,mix2([230,170,110],h3,.35));
+for(let i=0;i<3;i++)hillF(g,wv(r,3,24+i*6,.007+i*.002),R.ry+120+i*110,mix2([170,100,80],[40,20,40],.2+i*.25));
+addCloud(2,60,220,'#ffd9b0','#d46a7a',0);R.cm=Array.from({length:5},(_,i)=>({o:i*92,v:8,s:58+r()*8,col:'#1b1220'}));R.kind='cara'}
+function scDhow(g,r,R,addCloud,pick){scSea(g,r,R,addCloud,pick);R.kind='dhow';R.dh={o:r()*860,y:960*.7,s:74+r()*20}}
+/* --- kota-kota dunia Islam --- */
+function cAnd(g,r,hz,sil,hzc,night,K){hillF(g,wv(r,3,26,.01),hz+10,sil(.45));const bx=90+r()*140,c=sil(.28);g.fillStyle=c;g.fillRect(bx,hz-66,270,78);for(let i=0;i<14;i++)g.fillRect(bx+i*19+2,hz-78,10,14);
+[bx+14,bx+256].forEach(tx=>{g.fillRect(tx-24,hz-150,48,162);for(let i=0;i<4;i++)g.fillRect(tx-24+i*13,hz-162,9,14)});dome(g,bx+135,hz-66,96,54,c,0);
+g.fillStyle=night?'#ffd36a':'rgba(255,236,170,.7)';for(let i=0;i<6;i++){const wx=bx+48+i*34;g.beginPath();g.arc(wx,hz-36,7,Math.PI,0);g.rect(wx-7,hz-36,14,22);g.fill()}
+for(let i=0;i<8;i++){const x=r()*540,h=70+r()*90;g.fillStyle=sil(.12);g.beginPath();g.ellipse(x,hz+12-h/2,9,h/2,0,0,6.3);g.fill()}
+g.fillStyle=gr2(g,hz+12,960,[[0,sil(.3)],[1,sil(.02)]]);g.fillRect(0,hz+12,540,960);
+const ar=()=>{g.moveTo(70,960);g.lineTo(70,600);g.bezierCurveTo(28,470,120,250,270,215);g.bezierCurveTo(420,250,512,470,470,600);g.lineTo(470,960)};
+g.fillStyle=night?'#07060f':'#1a0f14';g.beginPath();g.rect(0,0,540,960);ar();g.closePath();g.fill('evenodd');g.strokeStyle='rgba(255,200,120,.45)';g.lineWidth=5;g.beginPath();ar();g.stroke()}
+function tiered(g,x,y,w,col,col2){g.fillStyle=col2;g.fillRect(x-w*.42,y-w*.3,w*.84,w*.3);for(let i=0;i<3;i++){const bw=w*(1.1-i*.3),th=w*.17,by=y-w*.3-i*(th+w*.07);if(i>0){g.fillStyle=col2;g.fillRect(x-bw*.38,by,bw*.76,w*.07)}g.fillStyle=col;g.beginPath();g.moveTo(x-bw*.5,by);g.lineTo(x-bw*.2,by-th);g.lineTo(x+bw*.2,by-th);g.lineTo(x+bw*.5,by);g.closePath();g.fill()}
+const top=y-w*.3-2*(w*.17+w*.07)-w*.17;g.fillStyle=col;g.fillRect(x-1.5,top-w*.16,3,w*.16);g.beginPath();g.ellipse(x,top-w*.17,w*.025,w*.045,0,0,6.3);g.fill()}
+function cNus(g,r,hz,sil,hzc,night,K){mtn(g,r,120+r()*300,hz+12,420,230+r()*80,sil(.5),sil(.38));hillF(g,wv(r,3,12,.014),hz+16,sil(.36));treeLine(g,r,hz+24,36,sil(.26),18);
+const mx=190+r()*160,my=hz+50;tiered(g,mx,my,150,sil(.1),sil(.22));for(let i=0;i<5;i++)palm(g,20+r()*500,hz+30+r()*30,150+r()*110,sil(.08),(r()-.5)*1.6);
+const gc=night?[16,40,34]:K=='day'?[84,150,70]:[70,110,64];for(let i=0;i<14;i++){const t0=Math.pow(i/14,1.7),t1=Math.pow((i+1)/14,1.7),y0=hz+44+(960-hz-44)*t0,y1=hz+44+(960-hz-44)*t1+1;g.fillStyle=mix2(gc.map(v=>v*(.8+.4*(i%2))),hzc,Math.max(.05,.6-t0*1.2));g.fillRect(0,y0,540,y1-y0)}
+palm(g,40,990,430,'#0c1214',.7);palm(g,505,990,360,'#0c1214',-.8)}
+function cOtt(g,r,hz,sil,hzc,night,K){hillF(g,wv(r,3,20,.012),hz+8,sil(.5));const cx=240+r()*90,by=hz+26,c=sil(.2);g.fillStyle=c;g.fillRect(cx-100,by-58,200,58);dome(g,cx,by-58,130,86,c,0);dome(g,cx-76,by-58,62,40,c,0);dome(g,cx+76,by-58,62,40,c,0);dome(g,cx-38,by-66,40,26,c,0);dome(g,cx+38,by-66,40,26,c,0);g.fillStyle=c;g.fillRect(cx-1,by-166,2,22);
+[-138,-112,112,138].forEach((d,i)=>minaret(g,cx+d,by,132+(i%2)*14,11,c));
+for(let i=0;i<26;i++){const x=r()*540;if(Math.abs(x-cx)<150)continue;const w=18+r()*28,h=16+r()*34,cc=sil(.15+r()*.2);g.fillStyle=cc;g.fillRect(x,by-h,w,h+4);if(r()<.4)dome(g,x+w/2,by-h,w*.8,w*.4,cc,0)}
+lakeFx(g,r,by+8,rg(hzc),rg(dk0(night,K)));for(let i=0;i<2;i++){const bx=60+r()*420,byy=by+60+r()*120,s=26+r()*18;poly(g,[[bx-s,byy],[bx+s,byy],[bx+s*.7,byy+s*.3],[bx-s*.7,byy+s*.3]],'#0d1020');poly(g,[[bx,byy-s*1.6],[bx,byy-s*.1],[bx+s*.8,byy-s*.1]],'#1a1830')}}
+function dk0(night,K){return night?[8,12,34]:[20,26,60]}
+function rib(g,x,y,w,h,col){g.fillStyle=col;g.fillRect(x-w*.36,y-h*.28,w*.72,h*.28);dome(g,x,y-h*.28,w,h*.72,col,2);g.strokeStyle='rgba(255,255,255,.22)';g.lineWidth=1.3;for(let k=-3;k<=3;k++){g.beginPath();g.moveTo(x+k*w*.07,y-h*.28);g.quadraticCurveTo(x+k*w*.2,y-h*.7,x,y-h);g.stroke()}}
+function cSam(g,r,hz,sil,hzc,night,K){const tq=night?[10,70,90]:[24,150,170],wl=night?[40,36,48]:[205,165,115],cT=a=>mix2(tq,hzc,a),cW=a=>mix2(wl,hzc,a),cx=250+r()*60;hillF(g,wv(r,3,18,.01),hz+10,cW(.6));
+g.fillStyle=cW(.3);g.fillRect(cx-250,hz-60,150,72);g.fillRect(cx+100,hz-60,150,72);rib(g,cx-175,hz-60,70,70,cT(.2));rib(g,cx+175,hz-60,70,70,cT(.2));
+rib(g,cx,hz-150,130,130,cT(.12));g.fillStyle=cW(.15);g.fillRect(cx-70,hz-190,140,202);g.fillStyle=cT(.1);g.fillRect(cx-70,hz-190,140,14);g.fillRect(cx-70,hz-120,140,6);
+g.beginPath();g.moveTo(cx-34,hz+12);g.lineTo(cx-34,hz-110);g.bezierCurveTo(cx-34,hz-150,cx-10,hz-160,cx,hz-172);g.bezierCurveTo(cx+10,hz-160,cx+34,hz-150,cx+34,hz-110);g.lineTo(cx+34,hz+12);g.closePath();g.fillStyle='rgba(10,20,40,.78)';g.fill();
+[-120,120].forEach(d=>{minaret(g,cx+d,hz+12,175,18,cW(.14),cT(.1));g.fillStyle=cT(.1);g.fillRect(cx+d-9,hz-120,18,8);g.fillRect(cx+d-9,hz-70,18,8)});
+g.fillStyle=gr2(g,hz+12,960,[[0,cW(.4)],[1,mix2(wl,[30,20,20],.5)]]);g.fillRect(0,hz+12,540,960);for(let i=0;i<6;i++){const x=r()*540,h=60+r()*60;g.fillStyle=mix2([40,90,60],hzc,.3);g.beginPath();g.ellipse(x,hz+30+r()*60,16,h/2,0,0,6.3);g.fill()}}
+function cMug(g,r,hz,sil,hzc,night,K){const m=night?[120,125,160]:[246,240,232],sh=night?[80,86,120]:[205,196,206],cM=a=>mix2(m,hzc,a),cS=a=>mix2(sh,hzc,a),cx=270,by=hz+24;hillF(g,wv(r,2,10,.01),hz+10,mix2([70,110,90],hzc,.55));
+g.fillStyle=cM(.3);g.fillRect(cx-170,by-18,340,18);g.fillStyle=cM(.18);g.fillRect(cx-72,by-100,144,82);g.fillStyle=cS(.15);g.beginPath();g.moveTo(cx-26,by-18);g.lineTo(cx-26,by-70);g.bezierCurveTo(cx-26,by-92,cx-8,by-96,cx,by-104);g.bezierCurveTo(cx+8,by-96,cx+26,by-92,cx+26,by-70);g.lineTo(cx+26,by-18);g.fill();
+g.fillStyle=cM(.18);g.fillRect(cx-40,by-120,80,22);dome(g,cx,by-120,92,100,cM(.15),1);g.save();g.beginPath();g.rect(cx,by-260,120,260);g.clip();dome(g,cx,by-120,92,100,cS(.15),1);g.restore();g.fillStyle=cM(.1);g.fillRect(cx-1.2,by-236,2.4,18);
+[-52,52].forEach(d=>{dome(g,cx+d,by-100,24,24,cM(.2),1);g.fillStyle=cM(.2);g.fillRect(cx+d-9,by-100,18,8)});[-154,154].forEach(d=>{g.fillStyle=cM(.2);g.fillRect(cx+d-6,by-150,12,150);dome(g,cx+d,by-150,22,20,cM(.2),1);g.fillRect(cx+d-9,by-100,18,4)});
+for(let i=0;i<10;i++){const x=(i<5?20+i*34:370+(i-5)*34)+r()*8,h=70+r()*50;g.fillStyle=mix2([24,60,44],hzc,.25);g.beginPath();g.ellipse(x,by+4-h/2,9,h/2,0,0,6.3);g.fill()}
+lakeFx(g,r,by+6,rg(hzc),'#101830');g.fillStyle='rgba(12,26,22,.9)';poly(g,[[0,960],[0,830],[120,960]],g.fillStyle);poly(g,[[540,960],[540,830],[420,960]],g.fillStyle)}
+function mudTower(g,x,y,w,h,col,dark){g.fillStyle=col;g.beginPath();g.moveTo(x-w/2,y);g.lineTo(x-w*.32,y-h);g.lineTo(x+w*.32,y-h);g.lineTo(x+w/2,y);g.closePath();g.fill();g.fillStyle=dark;g.beginPath();g.moveTo(x,y);g.lineTo(x+w/2,y);g.lineTo(x+w*.32,y-h);g.lineTo(x,y-h);g.closePath();g.fill();
+g.strokeStyle=dark;g.lineWidth=2;for(let k=1;k<6;k++){const yy=y-h*k/6.5,ww=w*(.5-.18*k/6.5);g.beginPath();g.moveTo(x-ww-7,yy);g.lineTo(x-ww+1,yy);g.moveTo(x+ww-1,yy);g.lineTo(x+ww+7,yy);g.stroke()}g.fillStyle=col;g.beginPath();g.ellipse(x,y-h-6,w*.12,9,0,0,6.3);g.fill()}
+function cTim(g,r,hz,sil,hzc,night,K){const mud=night?[64,46,42]:[204,152,98],cM=a=>mix2(mud,hzc,a),cD=a=>mix2(mud.map(v=>v*.7),hzc,a),cx=270;hillF(g,wv(r,3,14,.012),hz+8,cM(.6));
+const by=hz+34;g.fillStyle=cM(.15);g.fillRect(cx-215,by-46,430,46);for(let i=0;i<20;i++)g.fillRect(cx-215+i*22+2,by-56,12,12);
+[-190,-100,0,100,190].forEach((d,i)=>mudTower(g,cx+d,by,64+(i%2)*14,120+((i*37)%70),cM(.12),cD(.1)));
+g.fillStyle=night?'#ffd36a':'rgba(40,20,10,.7)';for(let i=0;i<5;i++){g.beginPath();g.arc(cx-150+i*75,by-20,8,Math.PI,0);g.rect(cx-158+i*75,by-20,16,20);g.fill()}
+g.fillStyle=gr2(g,by,960,[[0,cM(.35)],[1,mix2(mud,[30,16,14],.5)]]);g.fillRect(0,by,540,960);
+for(let i=0;i<4;i++){const x=20+r()*500,y=by+60+r()*160;g.fillStyle=mix2([40,34,24],hzc,.2);g.fillRect(x-2,y-30,4,32);g.beginPath();g.ellipse(x,y-34,34,8,0,0,6.3);g.fill()}
+hillF(g,wv(r,3,18,.01),960-60,mix2(mud.map(v=>v*.55),[20,10,10],.4))}
+function pagoda(g,x,y,w,n,col,col2){g.fillStyle=col2;g.fillRect(x-w*.22,y-n*w*.3,w*.44,n*w*.3);for(let i=0;i<n;i++){const bw=w*(1-i*.1),by=y-i*w*.3,th=w*.12;g.fillStyle=col;g.beginPath();g.moveTo(x-bw*.62,by-th*.2);g.quadraticCurveTo(x-bw*.5,by,x-bw*.42,by);g.lineTo(x+bw*.42,by);g.quadraticCurveTo(x+bw*.5,by,x+bw*.62,by-th*.2);g.quadraticCurveTo(x+bw*.4,by-th*.55,x+bw*.2,by-th*1.1);g.lineTo(x-bw*.2,by-th*1.1);g.quadraticCurveTo(x-bw*.4,by-th*.55,x-bw*.62,by-th*.2);g.fill()}
+const ty=y-n*w*.3;g.fillStyle=col;g.fillRect(x-1.5,ty-w*.3,3,w*.3);g.beginPath();g.arc(x,ty-w*.3,w*.035,0,6.3);g.fill()}
+function karst(g,x,by,w,h,col){g.fillStyle=col;g.beginPath();g.moveTo(x-w/2,by);g.bezierCurveTo(x-w*.42,by-h*.55,x-w*.2,by-h*1.05,x,by-h);g.bezierCurveTo(x+w*.2,by-h*1.05,x+w*.42,by-h*.55,x+w/2,by);g.closePath();g.fill()}
+function cChi(g,r,hz,sil,hzc,night,K){for(let i=0;i<5;i++)karst(g,40+i*120+r()*40,hz+16,150+r()*70,150+r()*140,sil(.62-.04*i));
+let q=g.createLinearGradient(0,hz-120,0,hz+30);q.addColorStop(0,'rgba(255,248,238,0)');q.addColorStop(.7,'rgba(255,248,238,.4)');q.addColorStop(1,'rgba(255,248,238,0)');g.fillStyle=q;g.fillRect(0,hz-120,540,150);
+hillF(g,wv(r,3,12,.014),hz+30,sil(.4));const c=sil(.12),c2=sil(.3),px=330+r()*80,by=hz+60;pagoda(g,px,by,92,5,c,c2);
+const hx0=150+r()*60;g.fillStyle=c2;g.fillRect(hx0-60,by-44,120,44);for(let i=0;i<2;i++){const w=150-i*40,y=by-44-i*26;g.fillStyle=c;g.beginPath();g.moveTo(hx0-w*.55,y-6);g.quadraticCurveTo(hx0-w*.4,y+2,hx0-w*.34,y);g.lineTo(hx0+w*.34,y);g.quadraticCurveTo(hx0+w*.4,y+2,hx0+w*.55,y-6);g.quadraticCurveTo(hx0+w*.3,y-18,hx0+w*.18,y-28);g.lineTo(hx0-w*.18,y-28);g.quadraticCurveTo(hx0-w*.3,y-18,hx0-w*.55,y-6);g.fill()}
+for(let i=0;i<16;i++)pine(g,r()*540,hz+64+r()*40,70+r()*70,sil(.1));
+g.fillStyle=gr2(g,by,960,[[0,sil(.3)],[1,sil(.02)]]);g.fillRect(0,by,540,960);for(let i=0;i<6;i++)pine(g,10+i*100+r()*40,990,200+r()*140,'#0b1016')}
+function cPer(g,r,hz,sil,hzc,night,K){const tq=night?[10,70,90]:[28,150,175],wl=night?[44,38,52]:[222,190,140],cT=a=>mix2(tq,hzc,a),cW=a=>mix2(wl,hzc,a),cx=270,by=hz+24;hillF(g,wv(r,3,26,.01),hz+4,mix2([120,100,120],hzc,.6));
+rib(g,cx,by-170,150,130,cT(.12));g.fillStyle=cW(.14);g.fillRect(cx-90,by-190,180,190);g.fillStyle=cT(.1);g.fillRect(cx-90,by-190,180,14);
+g.beginPath();g.moveTo(cx-48,by);g.lineTo(cx-48,by-110);g.bezierCurveTo(cx-48,by-150,cx-16,by-165,cx,by-182);g.bezierCurveTo(cx+16,by-165,cx+48,by-150,cx+48,by-110);g.lineTo(cx+48,by);g.closePath();g.fillStyle=cT(.55);g.fill();
+g.beginPath();g.moveTo(cx-34,by);g.lineTo(cx-34,by-104);g.bezierCurveTo(cx-34,by-134,cx-10,by-146,cx,by-158);g.bezierCurveTo(cx+10,by-146,cx+34,by-134,cx+34,by-104);g.lineTo(cx+34,by);g.closePath();g.fillStyle='rgba(8,18,36,.8)';g.fill();
+[-118,118].forEach(d=>{minaret(g,cx+d,by,215,14,cW(.14),cT(.1));g.fillStyle=cT(.1);g.fillRect(cx+d-8,by-150,16,10);g.fillRect(cx+d-8,by-100,16,10)});
+for(let i=0;i<10;i++){const x=i<5?24+i*30:372+(i-5)*30,h=80+r()*50;g.fillStyle=mix2([24,60,44],hzc,.2);g.beginPath();g.ellipse(x,by+2-h/2,9,h/2,0,0,6.3);g.fill()}
+lakeFx(g,r,by+4,rg(hzc),'#0b1c2e')}
+const CITY={andalusia:cAnd,nusantara:cNus,utsmani:cOtt,samarkand:cSam,mughal:cMug,timbuktu:cTim,tiongkok:cChi,persia:cPer};
+function scCity(g,r,R,sc,addCloud,pick){const W=540,H=960,K=pick(['dusk','dawn','gold','day','night']),reg=sc.slice(5),
+SK={dusk:['#2a2a6a','#e0708a','#ffbe7a'],dawn:['#5a64a8','#e8a2a2','#ffd9a6'],gold:['#3f6fb0','#f0c27a','#ffe9b0'],day:['#2a86dc','#7cc4f0','#d6eefc'],night:['#060a22','#1a2b62','#3d5290']}[K],
+hz=H*(.6+r()*.03),hzc=hx(SK[2]),night=K=='night',dk=night?[8,12,34]:K=='day'?[36,66,106]:[52,38,74],sil=t=>mix2(dk,hzc,t);
+g.fillStyle=gr2(g,0,hz+20,[[0,SK[0]],[.55,SK[1]],[1,SK[2]]]);g.fillRect(0,0,W,H);
+if(night){for(let i=0;i<150;i++){g.fillStyle='rgba(255,255,255,'+(.25+r()*.7)+')';const s=.6+r()*1.7;g.fillRect(r()*W,Math.pow(r(),1.3)*hz,s,s)}const mx=80+r()*380,my=120+r()*110;g.fillStyle='#f5efd0';g.beginPath();g.arc(mx,my,40,0,6.3);g.fill();g.fillStyle=SK[0];g.beginPath();g.arc(mx+17,my-6,36,0,6.3);g.fill();sunGlow(g,mx,my,150,.3);R.tw=Array.from({length:22},()=>[r()*W,r()*hz*.8,r()*6])}
+else sunGlow(g,90+r()*360,hz-100-r()*140,210,.85);
+(CITY[reg]||cAnd)(g,r,hz,sil,hzc,night,K);
+const q=g.createLinearGradient(0,hz-70,0,hz+60);q.addColorStop(0,'rgba('+hzc.join(',')+',0)');q.addColorStop(.6,'rgba('+hzc.join(',')+',.2)');q.addColorStop(1,'rgba('+hzc.join(',')+',0)');g.fillStyle=q;g.fillRect(0,hz-70,W,130);
+addCloud(night?2:3,50,240,night?'#3a4a86':'#fff4e0',night?'#232f66':rg(hzc),0);R.kind='city';R.kb=1;R.night=night}
+const NEWSC={geometri:scGeo,lentera:scLantern,interior:scInterior,perkamen:scParch,aurora:scAurora,karavan:scCaravan,kapal:scDhow};
+function kbDraw(g,R,t){if(!R.kb){g.drawImage(R.bg,0,0);return}const z=(R.kb==2?1.12:1.04)+.025*Math.sin(t*.12)+t*.0011,an=R.kb==2?Math.sin(t*.1)*.035:0;g.save();g.translate(270+Math.sin(t*.09)*10,480+Math.cos(t*.07)*8);g.rotate(an);g.scale(z,z);g.drawImage(R.bg,-270,-480);g.restore()}
+function dynFx(g,R,t){const k=R.kind;
+if(k=='geo'){g.save();g.globalCompositeOperation='screen';const a=.1+.06*Math.sin(t*.8),q=g.createRadialGradient(270,470,10,270,470,420);q.addColorStop(0,ga(R.gold||'#ffd37a',a*2));q.addColorStop(1,ga(R.gold||'#ffd37a',0));g.fillStyle=q;g.fillRect(0,0,540,960);g.restore()}
+else if(k=='lantern'){R.lan.forEach(L=>{const a=Math.sin(t*.8+L.ph)*.07,ex=L.x+Math.sin(a)*L.len,ey=Math.cos(a)*L.len;g.strokeStyle='rgba(70,45,20,.85)';g.lineWidth=1.4;g.beginPath();g.moveTo(L.x,0);g.lineTo(ex,ey);g.stroke();fanous(g,ex,ey+L.s*1.4,L.s,.8+.2*Math.sin(t*5+L.ph*3),L.c)})}
+else if(k=='inter'){g.save();g.globalCompositeOperation='screen';R.rays.forEach(y=>{g.fillStyle='rgba(255,236,190,'+(y.a*(.7+.3*Math.sin(t*.6+y.p)))+')';g.beginPath();g.moveTo(y.x,0);g.lineTo(y.x+y.w,0);g.lineTo(y.x+y.w+y.d,960);g.lineTo(y.x+y.d-y.w*.3,960);g.fill()});g.restore()}
+else if(k=='aurora'){g.save();g.globalCompositeOperation='screen';R.au.forEach(A=>{const tp=[],bt=[];for(let x=0;x<=540;x+=10){const y=A.b+Math.sin(x*.012+t*.35+A.p)*A.am+Math.sin(x*.03-t*.5+A.p*2)*A.am*.4,h=110+60*Math.sin(x*.02+t*.3+A.p);tp.push([x,y]);bt.push([x,y+h])}
+const q=g.createLinearGradient(0,A.b-80,0,A.b+260);q.addColorStop(0,'rgba('+A.c+',0)');q.addColorStop(.35,'rgba('+A.c+',.5)');q.addColorStop(1,'rgba('+A.c+',0)');g.fillStyle=q;g.beginPath();tp.forEach((v,i)=>i?g.lineTo(v[0],v[1]):g.moveTo(v[0],v[1]));bt.reverse().forEach(v=>g.lineTo(v[0],v[1]));g.closePath();g.fill()});g.restore()}
+else if(k=='parch'){g.save();g.globalCompositeOperation='screen';const f=.16+.05*Math.sin(t*7)+.03*Math.sin(t*13.3),q=g.createRadialGradient(62,740,4,62,740,330);q.addColorStop(0,'rgba(255,190,90,'+f*1.6+')');q.addColorStop(1,'rgba(255,190,90,0)');g.fillStyle=q;g.fillRect(0,300,540,660);g.restore();g.fillStyle='#e8dcc0';g.fillRect(52,772,20,58);g.fillStyle='#ffd27a';g.beginPath();g.ellipse(62,762+Math.sin(t*9),5+Math.sin(t*11)*.6,11+Math.sin(t*8),0,0,6.3);g.fill();g.fillStyle='#fff7d0';g.beginPath();g.ellipse(62,766,2.2,5,0,0,6.3);g.fill()}
+else if(k=='cara'){R.cm.forEach((c,i)=>{const x=((t*c.v+c.o)%760)-110;camel(g,x,R.ry-R.rf(x)+4,c.s,t+i*.7,c.col)})}
+else if(k=='dhow'){dhow(g,((t*9+R.dh.o)%860)-170,R.dh.y,R.dh.s,t,'#1a1024','#f3e6c8');for(let i=0;i<3;i++)bird(g,((t*(30+i*6)+i*170)%640)-50,110+i*38+Math.sin(t+i)*8,10+i,t+i,'#f6f1e6',false)}
+else if(k=='city'){if(R.tw)R.tw.forEach(s=>{g.globalAlpha=.3+.7*Math.abs(Math.sin(t*1.5+s[2]));g.fillStyle='#fff';g.fillRect(s[0],s[1],2,2)});g.globalAlpha=1;for(let i=0;i<4;i++)bird(g,((t*(28+i*5)+i*150)%640)-50,140+i*30+Math.sin(t+i)*8,9+i,t+i,R.night?'#c8cbe0':'#26222c',false)}}
+/* --- adegan: latar berganti mengikuti alur cerita --- */
+function adIdx(R,t){let i=0;while(i<R.adB.length&&t>=R.adB[i])i++;return i}
+function setupAd(R){const x=R.x;R.ad=null;if(R.img||!x.ad||x.ad.length<2)return;R.ad=x.ad.map((a,i)=>({scene:a.scene,chip:a.chip||'',Q:{x:{id:x.id+'#'+i,scene:a.scene}}}));R.adB=[];const n=R.ad.length;for(let i=1;i<n;i++)R.adB.push(R.nS+(R.tB1-R.nS)*i/n);R.ad.forEach(a=>{a.Q.bg=buildScene(a.Q)});R.bg=R.bg||1}
+function bgDraw(g,R,t){if(!R.ad){sceneFrame(g,R,t);return}const i=adIdx(R,t),Q=R.ad[i].Q,pv=i>0?R.ad[i-1].Q:null,b0=i>0?R.adB[i-1]:-9,a=clamp((t-b0)/.9);
+if(a>=1||!pv)sceneFrame(g,Q,t);else{sceneFrame(g,pv,t);const o=R.off||(R.off=(()=>{const c=document.createElement('canvas');c.width=540;c.height=960;return c})()),og=o.getContext('2d');og.clearRect(0,0,540,960);sceneFrame(og,Q,t);g.globalAlpha=a;g.drawImage(o,0,0);g.globalAlpha=1}}
+/* --- tampilan hasil, tes koneksi --- */
+async function genVideo(id,force){const x=S.items.find(i=>i.id==id);if(!x)return;vid=id;$('#vh').textContent=(x.judul||x.tema||x.jenis)+' · '+x.time;
+$('#log').textContent='';$('#rs').innerHTML='';$('#vb').hidden=$('#vb2').hidden=true;if(!$('#vd').open)$('#vd').showModal();try{if(window.Notification&&Notification.permission=='default')Notification.requestPermission()}catch(e){}
+if((x.narasi||x.dibuat)&&!force){lg('Konten sudah pernah dibuat. Menampilkan hasil.');show(x);if(!VID[id]&&S.cfg.key){lg('Video belum dirender (hilang bila halaman dimuat ulang). Merender sekarang...');try{await renderVideo(x);show(x)}catch(e){lg('Render gagal: '+e.message)}}return}
+try{await siapkanKonten(x);lg('3/4 Desain dipilih: scene '+x.scene+(x.ad?' (+'+(x.ad.length-1)+' adegan lain)':'')+', tata teks '+x.tata+'.');
+lg('4/4 Gambar, suara, dan render video (minimal '+MIN_V+' detik)...');show(x);try{await renderVideo(x)}catch(e){lg('Render gagal: '+e.message)}
+x.dibuat=new Date().toISOString();save();cal();show(x);lg('Selesai. Konten siap diperiksa.');notify('Video selesai: '+(x.judul||x.jenis))}catch(e){save();lg('GAGAL: '+e.message)}}
+$('#tkn').onclick=async()=>{const o=$('#tko'),b=$('#tkn');b.disabled=true;o.textContent='Menguji, mohon tunggu...';
+const T=[['Al-Quran (alquran.cloud)','https://api.alquran.cloud/v1/ayah/1:1'],['Al-Quran (quran.com)','https://api.quran.com/api/v4/verses/by_key/1:1'],['Hadits (jsDelivr)','https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-bukhari/1.json'],['Hadits (fastly jsDelivr)','https://fastly.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-bukhari/1.json'],['Hadits (GitHub raw)','https://raw.githubusercontent.com/fawazahmed0/hadith-api/1/editions/ara-bukhari/1.json'],['Hadits (gading.dev)','https://api.hadith.gading.dev/books/bukhari/1'],['Wikipedia Indonesia','https://id.wikipedia.org/w/api.php?action=query&list=search&srsearch=Andalusia&format=json&origin=*'],['Daftar Asmaul Husna','https://api.aladhan.com/v1/asmaAlHusna/1']];let ok=0,out='';
+for(const q of T){const t0=performance.now();try{await tmo(q[1],10000);ok++;out+='OK     '+q[0]+' ('+Math.round(performance.now()-t0)+' ms)\n'}catch(e){out+='GAGAL  '+q[0]+': '+e.message+'\n'}o.textContent=out}
+out+='\n'+(ok==T.length?'Semua sumber bisa dijangkau.':ok?'Sebagian sumber gagal. Program otomatis memakai sumber yang lain. Bila hadits tetap gagal, coba ganti jaringan (data seluler atau Wi-Fi lain) atau matikan pemblokir iklan untuk halaman ini.':'Semua sumber gagal. Periksa koneksi internet, VPN, atau pemblokir iklan.');o.textContent=out;b.disabled=false};
+
+/* --- panel teks kontras, halaman dalil, potongan naskah yang selaras suara, kartu penutup --- */
+const PALS=[{p:'8,22,28',a:'#ffd978'},{p:'26,10,38',a:'#9be7ff'},{p:'12,28,20',a:'#ffcf9e'},{p:'36,14,14',a:'#cfeeff'},{p:'10,14,40',a:'#ffe08a'},{p:'20,20,24',a:'#b8f2c8'}];
+function palOf(x){let h=0;for(const c of String(x.id))h=(h*31+c.charCodeAt(0))>>>0;return PALS[h%PALS.length]}
+function panel(g,PC,lum,x,y,w,h){g.save();g.shadowBlur=0;g.fillStyle='rgba('+PC.p+','+(.58+.3*lum)+')';rr(g,x,y,w,h,22);g.strokeStyle=PC.a;g.globalAlpha*=.85;g.lineWidth=1.5;g.stroke();g.restore()}
+function lumUpdate(g,R,t){if(R.lt!=null&&t>=R.lt&&t-R.lt<.4)return;R.lt=t;const c=R.lc||(R.lc=document.createElement('canvas'));c.width=c.height=4;const cx=c.getContext('2d',{willReadFrequently:true});
+const f=(sy,sh)=>{cx.clearRect(0,0,4,4);cx.drawImage(g.canvas,0,sy,540,sh,0,0,4,4);const d=cx.getImageData(0,0,4,4).data;let s=0;for(let i=0;i<d.length;i+=4)s+=(.2126*d[i]+.7152*d[i+1]+.0722*d[i+2])/255;return s/16};
+try{R.lum={t:f(0,230),m:f(250,440),b:f(790,170)}}catch(e){R.lum={t:.5,m:.5,b:.5}}}
+function pageAt(R,t){const w=(R.PW||[]).find(q=>t>=q.t0&&t<q.t1);if(!w||!R.PGS||!R.PGS[w.i])return{A:null,I:null,t0:0,lb:''};const p=R.PGS[w.i];return{A:p.A,I:p.I,lb:p.lb,t0:w.t0}}
+function chunkAt(R,t){return(R.SCH||[]).find(c=>t>=c.a&&t<c.b)||null}
+function textLayer(g,R,t){const x=R.x,T=R.T,W=540,PC=palOf(x),lm=R.lum||{t:.4,m:.4,b:.4},live=t<R.tOut,fo=clamp((T-t)/1),tt=x.tata;g.save();g.textAlign='center';
+let q=g.createLinearGradient(0,0,0,250);q.addColorStop(0,'rgba('+PC.p+','+(.2+.5*lm.t)+')');q.addColorStop(1,'rgba('+PC.p+',0)');g.fillStyle=q;g.fillRect(0,0,W,250);
+if(R.TT.L.length){g.globalAlpha=clamp((t-.2)/.8)*fo;g.shadowColor='rgba(0,0,0,.85)';g.shadowBlur=10;g.fillStyle='#fff';g.font='700 '+R.TT.s+'px system-ui,sans-serif';R.TT.L.forEach((l,i)=>g.fillText(l,270,128+i*R.TT.s*1.3))}
+g.shadowColor='rgba(0,0,0,.8)';g.shadowBlur=8;const PP=pageAt(R,t);
+if(live&&PP.A&&(PP.A.L.length||PP.I.L.length)){const A=PP.A,I=PP.I,ah=A.L.length*A.s*1.55,ih=I.L.length*I.s*1.45,lbh=PP.lb?30:0,tot=ah+(ih?ih+22:0),bh=tot+lbh,y0=470-bh/2;
+g.globalAlpha=clamp((t-PP.t0)/.35)*fo;panel(g,PC,lm.m,34,y0-30,472,bh+58);
+if(tt=='tengah-emas'){g.fillStyle=PC.a;g.fillRect(190,y0-20,160,2);g.fillRect(190,y0+bh+22,160,2)}
+if(tt=='tengah-bingkai'||tt=='tengah-kartu'){g.strokeStyle='rgba(255,255,255,.35)';g.lineWidth=1;g.strokeRect(46,y0-20,448,bh+38)}
+let y=y0;if(PP.lb){g.fillStyle=PC.a;g.font='600 17px system-ui,sans-serif';g.direction='ltr';g.fillText(PP.lb,270,y+14);y+=lbh}
+if(A.L.length){g.fillStyle='#fff';g.font=A.wt+' '+A.s+'px '+A.fam;g.direction='rtl';A.L.forEach((l,i)=>g.fillText(l,270,y+(i+1)*A.s*1.55-A.s*.3));y+=ah+22}
+g.direction='ltr';g.fillStyle='#f4f4f4';g.font=(I.wt||'400')+' '+I.s+'px system-ui,sans-serif';I.L.forEach((l,i)=>g.fillText(l,270,y+(i+1)*I.s*1.45-I.s*.3))}
+else if(live){const C=chunkAt(R,t);if(C&&C.L&&C.L.length){const lh=C.s*1.4,hh=C.L.length*lh,y0=470-hh/2;g.globalAlpha=clamp((t-C.a)/.3)*fo;panel(g,PC,lm.m,30,y0-28,480,hh+46);g.fillStyle='#fff';g.font='700 '+C.s+'px system-ui,sans-serif';C.L.forEach((l,i)=>g.fillText(l,270,y0+i*lh+C.s*.85))}}
+g.restore()}
+function extras(g,R,t){const x=R.x,W=540,H=960,PC=palOf(x),lm=R.lum||{t:.4,m:.4,b:.4};g.save();g.shadowColor='rgba(0,0,0,.7)';g.shadowBlur=8;g.textAlign='center';const fi=clamp((t-.3)/.8)*clamp((R.T-t)/1);
+g.shadowBlur=0;const bs=g.createLinearGradient(0,H-230,0,H);bs.addColorStop(0,'rgba(0,0,0,0)');bs.addColorStop(1,'rgba(0,0,0,'+(.35+.45*lm.b)+')');g.fillStyle=bs;g.fillRect(0,H-230,W,230);g.shadowBlur=8;
+const bt=BADGE[x.jenis]||String(x.jenis).toUpperCase();g.globalAlpha=fi;g.font='700 17px system-ui,sans-serif';const bw=g.measureText(bt).width+34;g.shadowBlur=0;g.fillStyle='rgba('+PC.p+',.92)';rr(g,270-bw/2,68,bw,29,14);g.strokeStyle=PC.a;g.lineWidth=1.2;g.stroke();g.shadowBlur=8;g.fillStyle=PC.a;g.fillText(bt,270,89);
+if(R.KT&&R.KT.L.length){const y0=128+(R.TT.L.length-1)*R.TT.s*1.3+R.KT.s*1.7;g.fillStyle=PC.a;g.font='600 '+R.KT.s+'px system-ui,sans-serif';R.KT.L.forEach((l,i)=>g.fillText(l,270,y0+i*R.KT.s*1.3))}
+if(R.ad&&t<R.tOut){const i=adIdx(R,t),c=R.ad[i].chip;if(c){const b0=i>0?R.adB[i-1]:0,a=clamp((t-b0-.4)/.6);g.globalAlpha=a*fi;g.font='600 20px system-ui,sans-serif';const w=g.measureText(c).width+30;g.shadowBlur=0;g.fillStyle='rgba('+PC.p+',.7)';rr(g,270-w/2,780,w,34,17);g.shadowBlur=8;g.fillStyle='#fff';g.fillText(c,270,803)}}
+if(R.SRC&&R.SRC.L.length&&t<R.tOut){g.globalAlpha=fi*.95;g.fillStyle='#fff';g.font='400 '+R.SRC.s+'px system-ui,sans-serif';const n=R.SRC.L.length;R.SRC.L.forEach((l,i)=>g.fillText(l,270,H-44-(n-1-i)*R.SRC.s*1.3))}
+if(t>=R.tOut&&R.O1){const a=clamp((t-R.tOut)/.5)*clamp((R.T-t)/.8),h1=R.O1.s*1.6,h2=R.O2.L.length*R.O2.s*1.4,h3=R.O3.L.length*R.O3.s*1.4,tot=h1+h2+14+h3,y0=470-tot/2;g.globalAlpha=a;panel(g,PC,.5,30,y0-30,480,tot+60);
+g.fillStyle=PC.a;g.font='700 '+R.O1.s+'px system-ui,sans-serif';g.fillText(R.O1.L[0],270,y0+R.O1.s);g.fillStyle='#fff';g.font='400 '+R.O2.s+'px system-ui,sans-serif';R.O2.L.forEach((l,i)=>g.fillText(l,270,y0+h1+(i+1)*R.O2.s*1.4-6));
+g.fillStyle='#d8d8d8';g.font='400 '+R.O3.s+'px system-ui,sans-serif';R.O3.L.forEach((l,i)=>g.fillText(l,270,y0+h1+h2+14+(i+1)*R.O3.s*1.4-6))}
+g.restore()}
+function layout(R){const g=document.createElement('canvas').getContext('2d'),x=R.x,SF='system-ui,sans-serif',pg=R.pgl||[];
+R.PGS=pg.map(p=>{const A=!!p.arab;return{A:fit(g,p.arab||'',A?'Amiri,serif':SF,'700',A?40:34,440,A?270:260,1.55,16),I:p.arab&&p.id?fit(g,p.id,SF,'400',21,440,180,1.45,13):(p.id?fit(g,p.id,SF,'700',32,440,260,1.4,18):{L:[],s:0}),lb:p.lb||''}});
+R.TT=fit(g,titleFor(x),SF,'700',30,440,140,1.3,18);R.KT=fit(g,x.ket||'',SF,'600',22,440,64,1.3,14);
+const lk=(x.sumberLink&&x.sumberLink.length)?' · '+x.sumberLink.join(', '):'';
+R.SRC=fit(g,x.sumber?'Sumber: '+x.sumber+lk:'',SF,'400',17,480,70,1.3,12);
+(R.SCH||[]).forEach(c=>{const f=fit(g,c.txt,SF,'700',30,430,300,1.4,20);c.L=f.L;c.s=f.s});
+R.O1=fit(g,'Semoga bermanfaat',SF,'700',36,430,60,1.2,24);R.O2=fit(g,'Bagikan agar kebaikan ini sampai ke lebih banyak orang, dan simpan sebagai pengingat.',SF,'400',23,430,110,1.4,16);R.O3=fit(g,x.sumber?'Sumber: '+x.sumber+lk:'',SF,'400',20,430,230,1.4,12)}
+/* --- naskah dipotong per kalimat, durasi tiap potongan mengikuti jeda suara asli --- */
+function chunksOf(txt){txt=String(txt||'').replace(/\s+/g,' ').trim();const wc=txt.split(' ').length;if(wc<=18)return[txt];
+const ss=txt.split(/(?<=[.!?\u2026])\s+/),out=[];let cur=[],cw=0;const flush=()=>{if(cur.length){out.push(cur.join(' '));cur=[];cw=0}};
+for(const s0 of ss){let parts=[s0];const n=s0.split(' ').length;if(n>20){parts=[];const w=s0.split(' ');let b=[];w.forEach(q=>{b.push(q);if((b.length>=11&&/[,;:]$/.test(q))||b.length>=16){parts.push(b.join(' '));b=[]}});if(b.length)parts.push(b.join(' '))}
+for(const p of parts){const pw=p.split(' ').length;if(cw&&cw+pw>18)flush();cur.push(p);cw+=pw;if(cw>=12)flush()}}
+flush();if(out.length>1&&out[out.length-1].split(' ').length<5){const l=out.pop();out[out.length-1]+=' '+l}return out}
+function energy(buf){const d=buf.getChannelData(0),sr=buf.sampleRate,w=Math.max(1,Math.floor(sr*.02)),n=Math.floor(d.length/w),r=new Float32Array(n);let mx=0;for(let i=0;i<n;i++){let a=0;for(let k=i*w;k<(i+1)*w;k++)a+=d[k]*d[k];r[i]=Math.sqrt(a/w);if(r[i]>mx)mx=r[i]}return{r,w:w/sr,th:Math.max(.006,mx*.06)}}
+function align(buf,wts){const E=energy(buf),r=E.r,th=E.th,w=E.w;let s=0,e=r.length-1;while(s<r.length&&r[s]<th)s++;while(e>s&&r[e]<th)e--;const s0=s*w,s1=(e+1)*w,ps=[];let run=0;
+for(let i=s;i<=e;i++){if(r[i]<th)run++;else{if(run*w>=.16)ps.push({t:(i-run/2)*w,l:run*w});run=0}}
+const tot=wts.reduce((p,c)=>p+c,0)||1,bd=[s0],used=new Set();let c=0;
+for(let i=0;i<wts.length-1;i++){c+=wts[i];let t=s0+(s1-s0)*c/tot,bi=-1,bs=1e9;ps.forEach((p,k)=>{if(used.has(k)||Math.abs(p.t-t)>1.6)return;const sc=(p.t<t?(t-p.t)*1.6:(p.t-t))-p.l*1.2;if(sc<bs){bs=sc;bi=k}});if(bi>=0){used.add(bi);t=ps[bi].t}bd.push(Math.max(t,bd[bd.length-1]+.3))}
+bd.push(s1);return wts.map((_,i)=>({a:bd[i],b:bd[i+1]}))}
+const wOf=c=>c.length+5*(c.match(/[.!?]/g)||[]).length+2*(c.match(/[,;:]/g)||[]).length;
+async function siapAudio(R,x,ac){const mode=(S.cfg.mv||{})[x.jenis]||DEF.mv[x.jenis]||'hemat',legacy=!(x.pg&&x.pg.length)&&x.arab;
+const pg=x.pg&&x.pg.length?x.pg:(legacy?[{arab:x.arab,id:x.terjemah,au:(/^\d+:\d+$/.test(x.ref||'')?qariUrls(x.ref,0):[]).concat(x.audio&&String(x.audio).indexOf('http')==0?[x.audio]:[])}]:[]);R.pgl=pg;
+R.segs=[];R.PW=[];R.SCH=[];let t=2;const say=mode!='tanpa',asma=x.mode=='asma',useAr=pg.length&&say&&(mode=='penuh'||mode=='arti'||mode=='qari'||asma),useId=pg.length&&say&&mode!='qari';
+lg('4b Menyiapkan suara (mode '+mode+')...');const st=[],n=pg.length;
+if(useAr){const bs=[];let ok=true;for(const p of pg){let b=null;if(p.au&&p.au.length){try{b=await ac.decodeAudioData(await(await fetchAu(p.au)).arrayBuffer())}catch(e){lg('    Bacaan qari gagal ('+e.message+')')}}bs.push(b);if(!b)ok=false}
+if(ok){bs.forEach((b,i)=>{st.push({t:t,i});R.segs.push([b,t]);t+=b.duration+.45});t+=.4;lg('    Bacaan qari siap ('+n+' bagian).')}
+else if(mode=='penuh'||mode=='qari'||asma){try{const bb=await tts(ac,pg.map(p=>p.arab).join('\n\n'));const al=align(bb,pg.map(p=>p.arab.length));al.forEach((a,i)=>st.push({t:t+a.a,i}));R.segs.push([bb,t]);t+=bb.duration+.6;lg('    Bacaan Arab suara AI siap.')}catch(e){lg('    Suara Arab gagal ('+e.message+').')}}}
+let tid=null;
+if(useId){try{const bi=await tts(ac,pg.map(p=>p.id).join('\n\n'));const al=align(bi,pg.map(p=>p.id.length));al.forEach((a,i)=>st.push({t:t+a.a,i}));R.segs.push([bi,t]);tid=t+al[al.length-1].b+.5;t+=bi.duration+.6;lg('    Suara arti siap ('+bi.duration.toFixed(1)+' detik).')}catch(e){lg('    Suara arti gagal ('+e.message+').')}}
+let endP=t;
+if(pg.length){if(!st.length){let c=1.2;pg.forEach((p,i)=>{st.push({t:c,i});c+=Math.max(5,(p.arab||'').length*.07+(p.id||'').split(' ').length/2.2+1.5)});endP=c}
+else{endP=Math.max(tid||0,...R.segs.map(q=>q[1]+q[0].duration))+.3;if(st[0])st[0].t=Math.min(st[0].t,1.0)}
+st.sort((a,b)=>a.t-b.t);st.forEach((q,k)=>R.PW.push({t0:k==0?Math.min(q.t,1):q.t,t1:k<st.length-1?st[k+1].t:endP,i:q.i}))}
+let nS=null;
+if(x.narasi){const ch=chunksOf(x.narasi),wts=ch.map(wOf);let bN=null;if(say&&mode!='qari'){try{bN=await tts(ac,x.narasi);lg('    Suara narasi siap ('+bN.duration.toFixed(1)+' detik, '+ch.length+' potongan teks).')}catch(e){lg('    Suara narasi gagal ('+e.message+').')}}
+t=(pg.length?endP:t)+.2;nS=t;
+if(bN){const al=align(bN,wts);R.segs.push([bN,t]);al.forEach((a,i)=>R.SCH.push({a:t+a.a,b:t+a.b,txt:ch[i]}));R.SCH[0].a=Math.max(t,R.SCH[0].a-.1);for(let i=0;i<R.SCH.length-1;i++)R.SCH[i].b=R.SCH[i+1].a;R.SCH[R.SCH.length-1].b+=.5;t+=bN.duration+.5}
+else{let c=t;ch.forEach(z=>{const d=z.split(' ').length*.42+.8;R.SCH.push({a:c,b:c+d,txt:z});c+=d});t=c}
+R.nS=nS;R.tB1=R.SCH[R.SCH.length-1].b}
+else{R.nS=2;R.tB1=Math.max(endP,3)}
+const cEnd=Math.max(endP,R.SCH.length?R.SCH[R.SCH.length-1].b:0,2);R.tOut=cEnd+.3;R.T=Math.max(R.tOut+4.5,MIN_V);R.hv=R.segs.length>0;
+lg('    Isi video '+cEnd.toFixed(0)+' detik'+(R.T>R.tOut+4.6?'; sisa waktu hingga '+MIN_V+' detik diisi kartu penutup (sumber dan ajakan), bukan pengulangan isi.':'.'));return R}
+function show(x){const V={teks:'Dalil (teks Arab dan terjemah) diambil langsung dari sumber teks.',wiki:'Naskah dirangkum dari artikel sumber (lihat tautan). Tetap periksa.',web:'Dirangkum dari hasil pencarian web agen (lihat tautan). WAJIB diperiksa.',bank:'Sebagian teks dari bank bawaan program. WAJIB dicek ulang.',ai:'PERHATIAN: tidak ada sumber. Teks ditulis AI dan BELUM terverifikasi.'}[x.ver]||'';
+const STD={quran:'Standar: surah, nomor ayat, teks, terjemah, tafsir (kitab dan mufasir).',hadis:'Standar: kitab, nomor jika ada, dan derajat hadis.',doaq:'Standar: sumber ayat dan nomornya.',doah:'Standar: sumber hadis dan status riwayat.',asma:'Standar: daftar Asmaul Husna dan penjelasan ulama.',narasi:'Standar: dalil, pendapat ulama (dengan nama dan perbedaannya), dan lembaga atau kitab rujukan.'}[x.mode]||'';
+const pgh=(x.pg||[]).map(p=>'<div class="ar" lang="ar">'+esc(p.arab)+'</div><p><b>'+esc(p.lb||'')+'</b><br>'+esc(p.id||'')+'</p>').join('');
+$('#rs').innerHTML=(VID[x.id]?'<video src="'+VID[x.id].url+'" controls playsinline style="width:100%;max-height:60vh;border-radius:10px;background:#000"></video>':'')+(V?'<div class="warn">'+esc(V)+'</div>':'')+'<h3>Pilar dan sub-tema</h3><p>'+esc(x.jenis)+' · '+esc(x.sub||'-')+'</p>'+(pgh?'<h3>Dalil</h3>'+pgh:(x.arab?'<h3>Teks sumber</h3><div class="ar" lang="ar">'+esc(x.arab)+'</div><p>'+esc(x.terjemah||'')+'</p>':''))+'<h3>Referensi</h3><p>'+esc(x.rujukan||'-')+'</p>'+(x.ket?'<h3>Keterangan di layar</h3><p>'+esc(x.ket)+'</p>':'')+(x.sumber?'<h3>Sumber yang tampil di video</h3><p>'+esc(x.sumber)+(x.sumberLink&&x.sumberLink.length?' · '+esc(x.sumberLink.join(', ')):'')+'</p>':'')+(x.sumberUrl&&x.sumberUrl.length?'<h3>Tautan sumber (buka dan periksa)</h3><p>'+x.sumberUrl.map(u=>'<a href="'+esc(u)+'" target="_blank" rel="noopener">'+esc(u)+'</a>').join('<br>')+'</p>':'')+(x.ad?'<h3>Adegan</h3><p>'+x.ad.map(a=>esc(a.scene+(a.chip?' ('+a.chip+')':''))).join(' → ')+'</p>':'')+'<h3>Desain video</h3><p>Scene: '+esc(x.scene)+' · Tata teks: '+esc(x.tata)+'</p>'+(x.narasi?'<h3>Penjelasan dan kesimpulan (dibacakan)</h3><p>'+esc(x.narasi)+'</p>':'')+'<h3>Caption</h3><p>'+esc(x.caption)+'</p><h3>5 hashtag</h3><p>'+(x.hashtag||'').split(/\s+/).filter(Boolean).map(h=>'<span class="chip">'+esc(h)+'</span>').join('')+'</p><div class="row"><button class="b o" id="cc">Salin caption dan hashtag</button></div><div class="warn">'+esc(STD)+' Periksa semua isi sebelum diunggah. Untuk fikih yang rumit, tanyakan kepada ahli ilmu.</div>';
+$('#vb').hidden=$('#vb2').hidden=false;$$('#vb [data-u]').forEach(b=>b.classList.toggle('o',!S.cfg[{YouTube:'yt',Facebook:'fb',TikTok:'tt'}[b.dataset.u]]))}
+
+/* --- suara bersih: tanpa kalimat perintah yang ikut terbaca, derau dan bunyi klik di jeda dibuang --- */
+function cleanVoice(b){const d=b.getChannelData(0),sr=b.sampleRate,n=d.length;
+let px=0,py=0;const a=Math.exp(-2*Math.PI*70/sr);for(let i=0;i<n;i++){const x0=d[i],y=a*(py+x0-px);px=x0;py=y;d[i]=y}
+const w=Math.max(1,Math.floor(sr*.01)),m=Math.floor(n/w);if(m<4)return b;const r=new Float32Array(m);let mx=0;
+for(let i=0;i<m;i++){let s=0;for(let k=i*w;k<(i+1)*w;k++)s+=d[k]*d[k];r[i]=Math.sqrt(s/w);if(r[i]>mx)mx=r[i]}
+const so=Array.from(r).sort((p,q)=>p-q),fl=so[Math.floor(m*.15)]||0,th=Math.max(fl*2.5,mx*.035,.002),op=new Uint8Array(m);let h=0;
+for(let i=0;i<m;i++){if(r[i]>=th)h=15;op[i]=h>0?1:0;if(h>0)h--}
+const o2=op.slice();for(let i=1;i<m;i++)if(o2[i]&&!o2[i-1]){for(let k=1;k<=3&&i-k>=0;k++)op[i-k]=1}
+let ls=-1,fs=-1;for(let i=0;i<m;i++)if(r[i]>mx*.08){if(fs<0)fs=i;ls=i}if(ls>=0){for(let i=ls+16;i<m;i++)op[i]=0;for(let i=0;i<fs-3&&i<m;i++)op[i]=0}
+const ca=1-Math.exp(-1/(sr*.006)),cr=1-Math.exp(-1/(sr*.04));let g0=0;
+for(let i=0;i<n;i++){const tg=op[Math.min(m-1,(i/w)|0)];g0+=(tg-g0)*(tg>g0?ca:cr);d[i]*=g0}
+const fi=Math.floor(sr*.005),fo=Math.floor(sr*.03);for(let i=0;i<fi&&i<n;i++)d[i]*=i/fi;for(let i=0;i<fo&&i<n;i++)d[n-1-i]*=i/fo;return b}
+async function tts(ac,text){const d=await gemAuto('s',{contents:[{parts:[{text:text}]}],generationConfig:{responseModalities:['AUDIO'],speechConfig:{voiceConfig:{prebuiltVoiceConfig:{voiceName:S.cfg.tv}}}}},180000);
+const q=d.candidates[0].content.parts.find(z=>z.inlineData),u=b2a(q.inlineData.data),n=u.length>>1,b=ac.createBuffer(1,n,24000),ch=b.getChannelData(0),v=new DataView(u.buffer);for(let i=0;i<n;i++)ch[i]=v.getInt16(i*2,true)/32768;return cleanVoice(b)}
+/* --- gambar latar: tanpa manusia, hewan, atau yang tidak pantas (disaring tag dan diperiksa AI) --- */
+const BLK=/\b(woman|women|man|men|girl|girls|boy|boys|people|person|portrait|model|bikini|swimsuit|fashion|lady|female|male|child|children|kid|kids|baby|face|couple|wedding|bride|dance|dancer|yoga|fitness|body|lingerie|sexy|beauty|hair|lips|selfie|crowd|family|student|worker|hand|hands|silhouette|dog|cat|horse|bird|birds|animal|animals|cow|lion|tiger|butterfly|insect|fish|deer|monkey|elephant|pet|puppy|kitten|sheep|goat|camel|duck|owl|eagle|snake|rabbit|bear|wolf|fox|cartoon|character|anime)\b/i;
+async function gambarAman(bmp){try{const k=Math.min(1,384/Math.max(bmp.width,bmp.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(bmp.width*k));c.height=Math.max(1,Math.round(bmp.height*k));c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+const b64=c.toDataURL('image/jpeg',.7).split(',')[1],d=await gemAuto('t',{contents:[{parts:[{text:'Periksa gambar latar untuk video dakwah Islam yang santun. Jawab hanya JSON dengan nilai true atau false: {"manusia": ada orang, wajah, tangan, atau siluet manusia sekecil apa pun; "hewan": ada hewan, burung, atau serangga; "aurat_atau_sensitif": ada tubuh terbuka, pakaian minim, atau hal tidak pantas; "teks_atau_logo": ada tulisan, logo, atau watermark}'},{inlineData:{mimeType:'image/jpeg',data:b64}}]}],generationConfig:{responseMimeType:'application/json',temperature:0}}),
+t=d.candidates[0].content.parts.map(z=>z.text||'').join(''),j=JSON.parse(t.replace(/```json|```/g,'').trim());return!(j.manusia||j.hewan||j.aurat_atau_sensitif||j.teks_atau_logo)}catch(e){lg('    Pemeriksa gambar gagal ('+String(e.message).slice(0,80)+'). Gambar dibuang demi keamanan.');return false}}
+function imok(){try{return JSON.parse(localStorage.getItem('ngelingan_imgok')||'{}')}catch(e){return{}}}
+async function bankAman(it){const key='b'+(it.id||it.name)+'_'+(it.blob?it.blob.size:0),c=imok();if(key in c)return c[key];const ok=await gambarAman(await createImageBitmap(it.blob));try{const m=imok();m[key]=ok;localStorage.setItem('ngelingan_imgok',JSON.stringify(m))}catch(e){}return ok}
+const PXQ={sawah:'rice field sunrise landscape',danau:'calm lake mist morning',gunung:'mountain sunrise clouds',pantai:'empty beach sunset waves','langit-malam':'night sky stars milky way','padang-pasir':'desert dunes sunset',hujan:'rain drops leaves',  'kebun-kelapa':'coconut palm sunset',hutan:'forest sunlight rays','pagi-berkabut':'misty morning landscape',geometri:'islamic geometric pattern',interior:'mosque interior arches empty',perkamen:'old paper texture parchment',aurora:'aurora borealis night sky',lentera:'ramadan lantern night',karavan:'desert dunes sunset',kapal:'sailing boat sea sunset'};
+async function pixabayImg(x){const key=pxGet();if(!key)return null;const Q=PXQ[x.scene]||(String(x.scene).indexOf('kota-')==0?'mosque dome minaret skyline sunset':'nature landscape sunrise');lg('    Mencari foto Pixabay: '+Q);
+const r=await fetch('https://pixabay.com/api/?key='+encodeURIComponent(key)+'&q='+encodeURIComponent(Q)+'&image_type=photo&orientation=vertical&safesearch=true&per_page=60&page='+(1+Math.floor(Math.random()*2)));if(!r.ok)throw new Error('Pixabay HTTP '+r.status);
+const all=(await r.json()).hits||[],h=all.filter(p=>!BLK.test(p.tags||'')).sort(()=>Math.random()-.5);lg('    '+all.length+' foto ditemukan, '+h.length+' lolos saringan tag.');
+for(const p of h.slice(0,4)){try{const m=await fetch(p.largeImageURL||p.webformatURL);if(!m.ok)continue;const bmp=await createImageBitmap(await m.blob());if(await gambarAman(bmp)){lg('    Foto Pixabay lolos pemeriksaan AI (pengunggah: '+(p.user||'-')+').');return bmp}lg('    Satu foto ditolak pemeriksa AI (ada manusia, hewan, atau tidak pantas).')}catch(e){}}
+throw new Error('tidak ada foto yang lolos pemeriksaan')}
+async function getImg(x){let src='kode';try{src=localStorage.getItem('ngelingan_bgsrc')||'kode'}catch(e){}if(src=='kode')return null;
+const a=await BG.all(),m=a.filter(z=>z.scene==x.scene),u=a.filter(z=>z.scene=='umum'),pool=(m.length?m:(u.length?u:a)).slice();
+const tryBank=async()=>{for(const it of pool.sort(()=>Math.random()-.5).slice(0,4)){if(await bankAman(it)){lg('    Gambar bank latar lolos pemeriksaan.');return createImageBitmap(it.blob)}}return null};
+if(pool.length&&(src=='unggah'||Math.random()<.5)){const b=await tryBank();if(b)return b;lg('    Gambar bank latar ditolak pemeriksa (ada manusia, hewan, atau tidak pantas).')}
+if(src=='campur'){try{const im=await pixabayImg(x);if(im)return im}catch(e){lg('    Pixabay: '+String(e.message).slice(0,120))}}
+lg('    Tidak ada gambar yang lolos pemeriksaan, memakai ilustrasi buatan kode.');return null}
+try{const bs=$('#bgsrc');if(bs&&bs.nextElementSibling)bs.nextElementSibling.textContent+=' Setiap gambar dari bank atau Pixabay diperiksa AI dan dibuang bila ada manusia, hewan, atau yang tidak pantas. Bila ingin paling aman, pilih ilustrasi buatan kode.'}catch(e){}
+
+/* ===== akhir PERBAIKAN 8 ===== */
+$('#khb').onclick=async()=>{const o=$('#tko'),b=$('#khb');b.disabled=true;let n=0,tr=0;o.textContent='Mengumpulkan hadis dari sumber internet...';HERR={};
+while(n<25&&tr<60){tr++;const k=Math.random()<.55?'bukhari':'muslim',no=1+Math.floor(Math.random()*(k=='bukhari'?7000:3000));const d=await getHadith(k,no);if(!d){if(tr>=6&&n==0){o.textContent='Gagal: sumber hadis tidak bisa dijangkau.\n'+Object.entries(HERR).map(e=>e[0]+' = '+e[1]).join('\n')+'\nCoba ganti jaringan, lalu ulangi.';b.disabled=false;return}continue}
+if(d.arab.length<=420&&d.id.length<=600&&hbkAdd({ar:d.arab,id:d.id,rj:'HR. '+(k=='bukhari'?'Bukhari':'Muslim')+' no. '+d.number,tag:''}))n++;o.textContent='Terkumpul '+n+' hadis baru...'}
+o.textContent='Selesai: '+n+' hadis baru masuk bank. Total bank = '+(HB.length+hbk().length)+' hadis (bawaan '+HB.length+' + terkumpul '+hbk().length+').';b.disabled=false};
+load();$('#gj').innerHTML=J.map(j=>'<option>'+j+'</option>').join('');
+$('#mvbox').innerHTML=J.map(j=>{const d=j.replace(/[^A-Za-z0-9]/g,'_');return '<label for="mv_'+d+'">'+j+'</label><select id="mv_'+d+'">'+['qari','arti','hemat','penuh','tanpa'].map(m=>'<option'+((((S.cfg.mv||{})[j])||DEF.mv[j]||'hemat')==m?' selected':'')+'>'+m+'</option>').join('')+'</select>'}).join('');$('#sk').value=S.cfg.key;$('#sst').value=S.cfg.sb||'gagal';$('#sm').value=S.cfg.model;$('#sn').value=S.cfg.slots;$('#sw').value=S.cfg.wm;$('#syt').value=S.cfg.yt;$('#sfb').value=S.cfg.fb;$('#stt').value=S.cfg.tt;$('#sim').value=S.cfg.im;$('#stm').value=S.cfg.tm;$('#stv').value=S.cfg.tv;cal();restore();
+</script>
+<script>if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}</script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+Ngelingan online.
+Unggah SEMUA file di folder ini (bukan file zip-nya) ke GitHub Pages atau Netlify.
+index.html adalah programnya. File lain membuatnya bisa dipasang seperti aplikasi.
+Kunci API Gemini TIDAK ada di dalam file. Isi lagi di Pengaturan setelah program terbuka di alamat baru.
